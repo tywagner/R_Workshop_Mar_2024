@@ -1,0 +1,506 @@
+---
+title: "Introduction to rstanarm"
+author: "Ty Wagner"
+institute: "PACFWRU, Penn State University"
+date: today
+format:
+  revealjs:
+    highlight-style: github
+    slide-number: c/t
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(dplyr) # data management
+library(tidyverse)
+library(ggplot2) # plot
+library(lubridate) # dates
+library(bslib) # a modern UI toolkit for Shiny and R Markdown 
+library(stringr) # manipulate character stings
+library(sf) # map creation
+library(spData) # spatial data
+library(car)  # logit function
+library(ggmap) # Use Google Map services
+library(kableExtra) # making tables
+library(rstanarm) # Fit common regression models using Stan
+library(bayesplot) # Visualize MCMC stan output
+library(rstan)
+library(loo)
+
+```
+
+## Bayesian models using rstanarm
+
+-   For "common" regression models, writing out code in Stan (as we will see) can be tedious
+
+-   rstanarm was developed to fit Bayesian models using Stan, but allowing for user-friendly model syntax that emulates other R functions
+
+## rstanarm can fit regressions similar to functions like:
+
+::: incremental
+-   [lm]{style="font-family: 'Courier New'"}: linear models
+
+-   [glm]{style="font-family: 'Courier New'"}: generalized linear models
+
+-   [glmer]{style="font-family: 'Courier New'"}: linear mixed models
+
+-   [gamm4]{style="font-family: 'Courier New'"}: generalized linear additive models
+
+-   However, rstanarm functions start with "stan\_<model type>"
+:::
+
+## Basic syntax
+
+Similar to commonly used frequentist model fitting functions
+
+For a simple linear regression model:
+
+$$
+y_i = \beta_0 + \beta_1 \times X_i + \epsilon_i, \quad i = 1,2, \ldots N
+$$
+
+$$
+\epsilon_i \sim N(0, \sigma^2)
+$$ Using [lm]{style="font-family: 'Courier New'"}
+
+```{r, eval=FALSE}
+
+lm(y ~ x, data = data_name)
+
+```
+
+Using rstanarm
+
+```{r, eval=FALSE}
+
+stan_glm(Y ~ X, data = data_name,
+  family = gaussian)
+
+```
+
+## Let's simulate some data
+
+The model $$
+y_i = \beta_0 + \beta_1 \times X_i + \epsilon_i, \quad i = 1,2, \ldots N
+$$
+
+$$
+\epsilon_i \sim N(0, \sigma^2)
+$$
+
+## R code
+
+```{r, eval=TRUE, echo=TRUE}
+set.seed(1857)
+# Number of observations
+N <- 50
+# Intercept
+B0 <- 1
+# Slope
+B1 <- 0.70
+# Predictor variable
+X <- rnorm(N, 0, 1)
+# Expected value
+mu <- B0 + B1 * X
+# Residual standard deviation
+sigma <- 0.50
+# Response with error
+Y <- rnorm(n = N, mean = mu, sd = sigma)
+# Create data frame
+data <- data.frame(Y, X)
+```
+
+## Model using lm
+
+```{r, echo=TRUE, eval=TRUE}
+# Fit regression model
+summary(lm(Y~X, data=data))
+```
+
+## Fit model using stan_glm
+
+```{r, echo=TRUE, eval=TRUE}
+# Fit Bayesian regression model
+stan_m1 <- stan_glm(Y ~ X, data = data,
+  family = gaussian)
+
+```
+
+## Summarize posterior
+
+```{r, echo=TRUE, eval=TRUE}
+summary(stan_m1, digits = 3)
+```
+
+## Check convergence
+
+```{r, eval=TRUE, echo=TRUE, fig.align='center'}
+# Check trace plots
+# Convert stan object to array for plotting
+# using bayesplot functions
+posterior <- as.array(stan_m1)
+
+mcmc_trace(posterior, pars = c("(Intercept)", "X"))
+```
+
+## Extract at MCMC draws
+
+```{r, eval=TRUE, echo=TRUE}
+# Extract posterior samples for summarizing, plotting, etc.
+samples <- stan_m1 %>%
+  as.data.frame
+head(samples, 5)
+
+# Plot posterior distributions
+# Go from wide to long for facet plotting
+post_plot <- samples %>%
+  gather(parameter, value, `(Intercept)`:sigma, factor_key=TRUE)
+head(post_plot, 5)
+```
+
+## Visualize posterior distributions
+
+```{r, echo=FALSE, eval=TRUE, fig.align='center'}
+# Plot
+ggplot(data = post_plot, aes(x = value)) +
+  facet_wrap(~parameter)+
+  geom_histogram(bins = 50, color = 'blue', alpha = 0.5) +
+  theme_bw() +
+  theme(strip.text.y = element_text(size=11, face="bold"),
+        axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))+
+  ylab("Count") + xlab("Value")
+```
+
+## Calculate posterior summaries
+
+```{r, eval=TRUE, echo=TRUE}
+# Look at credible interval
+posterior_interval(stan_m1, prob = 0.95)
+```
+
+## Do by hand for more control
+
+```{r, eval=TRUE, echo=TRUE}
+post_plot %>%
+  group_by(parameter) %>%
+  summarise(mean = mean(value),
+            lower = quantile(value,probs = 0.025),
+            upper = quantile(value,probs = 0.975)) %>%
+  kbl(caption = "Posterior estimates", digits=3,
+    col.names = c("Parameter", "Mean", "Lower CI", "Upper CI")) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+
+## Plot estimates
+
+```{r, echo=TRUE, eval=TRUE, fig.align='center'}
+# Default shows 80% and 90% credible intervals
+plot(stan_m1)
+```
+
+## 
+
+![](viz.png){fig-align="center"}
+
+## Visualize model fit
+
+```{r, eval=TRUE, echo=TRUE}
+# Create a fake predictor variable corresponding to our X
+fake.x <- seq(min(X), max(X), length=50)
+# Container to hold predicted values
+preds <- array(NA, c(dim(samples)[1], length(fake.x)))
+# Predict across values of X for all MCMC samples
+for(i in 1:length(fake.x)){
+  preds[,i] <- samples$`(Intercept)` + samples$X * fake.x[i]
+}
+dim(preds)
+mean.fit <- apply(preds, 2, mean) # posterior mean
+# 95% CIs
+lower <- apply(preds, 2, quantile, 0.025)
+upper <- apply(preds, 2, quantile, 0.975)
+# Data frame for plotting
+plot_fit_m1 <- data.frame(mean.fit, lower, upper, fake.x)
+```
+
+## Plot code
+
+```{r, echo=TRUE, eval=FALSE}
+ggplot() +
+  geom_line(data=plot_fit_m1, aes(x=fake.x, y=mean.fit), linewidth=0.8) +
+  geom_ribbon(data=plot_fit_m1, aes(x=fake.x, ymax=upper, ymin=lower),
+              fill="green", alpha=0.3) +
+  geom_point(data=data, aes(x=X, y=Y)) +
+  xlab('X') +
+  ylab('Y') +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.title = element_text(size=12),
+        axis.text = element_text(size=12))
+```
+
+## Plot
+
+```{r, eval=TRUE, echo=FALSE, fig.align='center'}
+ggplot() +
+  geom_line(data=plot_fit_m1, aes(x=fake.x, y=mean.fit), linewidth=0.8) +
+  geom_ribbon(data=plot_fit_m1, aes(x=fake.x, ymax=upper, ymin=lower),
+              fill="green", alpha=0.3) +
+  geom_point(data=data, aes(x=X, y=Y)) +
+  xlab('X') +
+  ylab('Y') +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.title = element_text(size=12),
+        axis.text = element_text(size=12))
+```
+
+## 
+
+::: callout-note
+The credible interval in the previous figure is a 95% credible interval - it accounts for uncertainty in the $\beta$'s (only uncertainty in the mean). To plot a 95% prediction interval we would also need to account for uncertainty in $\sigma$.
+:::
+
+## Stan options
+
+To this point we have relied on default settings for fitting the regression model in rstanarm, but this may not always be desirable
+
+```{r, echo=TRUE, eval=FALSE}
+stan_m2 <- stan_glm(Y ~ X, data = data,
+                    family = gaussian,
+                    iter = 2000, # of iterations per chain
+                    warmup = 1000, # of iter to use in warmup
+                    chains = 1, # of chains to run
+                    cores = 1, # of parallel cores to run chains on
+                    prior = normal(), # specify a prior
+                    control =
+                      list(max_treedepth = 15,
+                           adapt_delta = 0.8) )
+                            
+```
+
+## MCMC controls
+
+-   **max_treedepth**: controls how far the model will look for a new proposal before giving up. Higher values allow model to explore a flatter posterior (increases computation time)
+
+-   **max_treedepth**: The target rate that new proposals are accepted. Higher value means the model takes smaller steps (increases computation time)
+
+## 
+
+::: callout-tip
+## MCMC best practices - run multiple chains
+
+-   Allows for convergence diagnostics, all chains should converge to the same place
+
+-   3 or 4 is a good number of chains
+
+-   Chains can be run in parallel
+:::
+
+## Setting priors
+
+-   Defaults may not be desired, see `?rstanarm::priors` for details
+
+## Informative prior example
+
+What if we had very strong prior information that $\beta_1$ was 2.
+
+```{r, eval=TRUE,  echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
+stan_m3 <- stan_glm(Y ~ X, data = data,
+                    family = gaussian,
+                    prior = normal(2,0.025), # prior on the model coefficients
+                    prior_intercept = normal(autoscale = TRUE), # default prior for intercept
+                    prior_aux = exponential(autoscale = TRUE) ) # default prior for sigma
+```
+
+## Compare effects of this prior
+
+```{r, eval=TRUE, echo=FALSE}
+samples3 <- stan_m3 %>%
+  as.data.frame
+
+post_plot3 <- samples3 %>%
+  gather(parameter, value, `(Intercept)`:sigma, factor_key=TRUE)
+# head(post_plot3)
+```
+
+```{r, echo=FALSE}
+post_plot3 %>%
+  group_by(parameter) %>%
+  summarise(mean = mean(value),
+            lower = quantile(value,probs = 0.025),
+            upper = quantile(value,probs = 0.975)) %>%
+  kbl(caption = "Posterior estimtes - informative prior", digits=3,
+      col.names = c("Parameter", "Mean", "Lower CI", "Upper CI")) %>%
+  kable_classic(full_width = F, html_font = "Cambria",  font_size = 30)
+
+post_plot %>%
+  group_by(parameter) %>%
+  summarise(mean = mean(value),
+            lower = quantile(value,probs = 0.025),
+            upper = quantile(value,probs = 0.975)) %>%
+  kbl(caption = "Posterior estimates - diffuse prior", digits=3,
+    col.names = c("Parameter", "Mean", "Lower CI", "Upper CI")) %>%
+  kable_classic(full_width = F, html_font = "Cambria",  font_size = 30)
+```
+
+## 
+
+#### Compare samples from the posterior and the prior
+
+```{r}
+#| layout-ncol: 2
+#| fig-width: 10
+#| fig-height: 8
+#| out-width: 10in
+#| out-height: 8in
+#| fig-cap:
+#|   - "Diffuse"
+#|   - "Informative"
+#| warning: false
+#| echo: false
+#| fig.env: figure*
+# Diffuse priors
+posterior_vs_prior(stan_m1)
+
+# Informative prior on beta1 (X)
+
+posterior_vs_prior(stan_m3)
+```
+
+## Evaluate model fit
+
+-   **R-hat**: measures whether all the chains have mixed for each parameter. Parameters with high R-hat values probably haven't converged
+
+```{r}
+# Rhat for intercept
+round(rstan::Rhat(posterior[,,1]),3)
+```
+
+-   **Bulk ESS**: Measures the effective sample size of each parameter. Too low suggests you might need more iterations or re-parameterization
+
+```{r}
+# Bulk ESS for intercept
+round(rstan::ess_bulk(posterior[,,1]),3)
+```
+
+## Statistical inference
+
+-   Look at if X% credible interval overlaps zero (a frequentist vibe)
+
+-   Look at posterior probabilities
+
+## Posterior probability
+
+-   Ask the question: "what is the posterior probability that $\beta_1$ is positive?
+
+```{r, echo=TRUE, eval=TRUE}
+mean(samples$X > 0)
+```
+
+-   Ask the question: "what is the posterior probability that $\beta_1$ is greater than 0.45?
+
+```{r, echo=TRUE, eval=TRUE}
+mean(samples$X > 0.45)
+```
+
+## Posterior probability
+
+You can imagine some more informative questions to ask with different models
+
+-   What is the posterior probability that abundance is \> X?
+
+-   What is the posterior probability that catch-per-unit effort is declining over time?
+
+-   What is the posterior probability that species X is more abundant than species Y?
+
+-   What is the posterior probability that lake A has greater abundance than lake B?
+
+## Compare models (hypotheses)
+
+-   Out-of-sample (oos): if prediction is the goal, then it makes sense to evaluate models in terms of predictive performance
+
+    -   oos data are observations not used to fit the model (i.e., use "training" and validation \[oos\] data)
+
+-   Information criteria (Akaike Information Criterion \[AIC\], Deviance Information Criterion \[DIC\], etc.): For Bayesian models we commonly use leave-one-out cross-validation (LOO) information criterion (LOO-IC)
+
+## LOO-IC ( R package loo)
+
+-   By estimating the fit of out-of-sample data the LOO-IC, like other IC, avoids selecting models that are overfit to the observed data
+
+-   Essentially, model performance is evaluated and the model is then penalised for complexity
+
+-   **Lower LOO-IC** indicates better goodness of fit (preferred model)
+
+    -   A difference of \> 2 in the LOO-IC between two models indicates statistical significance
+
+## LOO-IC example
+
+Simulate some data
+
+The model $$
+y_i = \beta_0 + \beta_1 \times X1_i + \beta_2 \times X2_i + \epsilon_i, \quad i = 1,2, \ldots N
+$$
+
+$$
+\epsilon_i \sim N(0, \sigma^2)
+$$
+
+## Simulation
+
+```{r}
+set.seed(1857)
+# Number of observations
+N <- 100
+# Intercept
+B0 <- 1
+# Slope 1
+B1 <- 0.15
+# Slope 2
+B2 <- -0.30
+# Predictor variables
+X1 <- rnorm(N, 0, 1)
+X2 <- rnorm(N, 0, 1)
+# Expected value
+mu <- B0 + B1 * X1 + B2 * X2
+# Residual standard deviation
+sigma <- 0.50
+# Response with error
+Y <- rnorm(n = N, mean = mu, sd = sigma)
+data <- data.frame(Y, X1, X2)
+
+```
+
+## Fit model using lm
+
+```{r}
+# Fit regression model
+summary(lm(Y ~ X1 + X2, data = data))
+```
+
+## Fit model using stan_glm
+
+```{r, eval=TRUE,  echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
+stan_mX1 <- stan_glm(Y ~ X1, data = data,
+                    family = gaussian)
+
+stan_mX1X2 <- stan_glm(Y ~ X1 + X2, data = data,
+                       family = gaussian)
+
+```
+
+```{r}
+# Calculate LOO-IC, smaller is better
+looX1 <- loo(stan_mX1)
+looX1$estimates[3,]
+looX1X2 <- loo(stan_mX1X2)
+looX1X2$estimates[3,]
+```
+
+## Predictor variable selection
+
+-   Could remove non-significant parameters (e.g., forward, stepwise selection, etc.)
+
+-   Fit model with predictors hypothesized to be important and report all results, even for those that overlap with zero (i.e., don't remove any non-significant predictors)
+
+## Exercise
