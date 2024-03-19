@@ -1,0 +1,66 @@
+---
+title: |
+  ![](R_logo.png){width=1.0in}\linebreak\linebreak
+  Workshop 
+subtitle: "March 21-22, 2024"
+
+format:
+  revealjs:
+    scrollable: true
+    highlight-style: github
+    slide-number: c/t
+---
+
+## Welcome 
+
+-   Introductions
+
+![](workshop.png)
+
+## Setting expectations 
+
+-   Learning **R**/Bayesian inference/hierarchical models takes time and practice - so what can we do in two days?
+
+## Format 
+
+-   Lecture
+
+-   Exercises
+
+-   Discussions
+
+## Files
+
+- Everything is reproducible (theoretically)
+
+## Revised agenda
+
+-   Intro to R (up to plotting)
+
+::: incremental
+-   Exercise \# 1 (data manipulation)
+
+-   Intro to R (plotting)
+
+-   Exercise \# 2 (data visualization)
+
+-   Intro to Bayesian inference/estimation
+:::
+
+## Revised agenda
+
+-   Intro to `rstanarm` library
+
+::: incremental
+-   Intro to hierarchical models
+
+-   Exercise \# 3 (analysis of catch-per-unit effort data)
+
+-   Exercise \# 4 (temporal trends in fantail darter abundance)
+
+-   If time...hierarchical growth models, left-censored data, other examples
+:::
+
+##
+
+![](workshop2.png)
