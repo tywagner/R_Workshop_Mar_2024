@@ -1,0 +1,280 @@
+---
+title: |
+  ![](R_logo.png){width=1.0in}\linebreak\linebreak
+  Workshop 
+subtitle: "Exercise # 2: Data visualization"
+
+format: pdf
+editor: visual
+geometry:
+      - top=25.4mm
+      - left=25.4mm
+      - right=25.4mm
+      - bottom=25.4mm
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+# Load R packages
+library(dplyr) # data manipulation
+library(tidyverse) # data manipulation
+library(lubridate) # work with dates
+library(kableExtra) # make tables
+
+library(ggplot2) # plotting data and spatial (simple feature; sf) objects
+library(sf) # map creation (simple features)
+library(spData) # provides access to polygons of US states
+```
+
+## Goal
+
+The goal of this exercise is to gain experience plotting data using `ggplot`. Specifically, we will make a simple map of our study site (Mauch Chunk Lake) and create barplots illustrating catch-per-unit effort for different species over time.
+
+Although it is fine to have all the workshop **R** packages installed and loaded into the current session, the specific R packages this exercise uses are:
+
+```{r, echo=TRUE, eval=FALSE}
+library(dplyr) # data manipulation
+library(tidyverse) # data manipulation
+library(lubridate) # work with dates
+library(kableExtra) # make tables
+# New for Ex. 2
+library(ggplot2) # plotting data and spatial (simple feature; sf) objects
+library(sf) # map creation (simple features)
+library(spData) # provides access to polygons of US states
+```
+
+```{r, echo=FALSE}
+# so we can navigate into the 02_Data folder where our data are located
+dat <- read_csv("../../02_Data/Mauch_lake/Mauch_lake_surveys_NBE.csv")
+
+# Clean data
+dat_clean <- dat %>% 
+  select(-c(`Water Name`, `Unique Water Site ID`,
+            `Water Section ID`, `Group Size Fish Length`,
+            `Survey Purpose`, `Water Site Comment`,
+            `Water Site Survey Comment`, Month, Description)) %>% # remove unwanted columns
+  rename(Water_site_survey_ID  = `Water Site Survey ID`,
+         Lat = `Survey Site Lat DD`,
+         Long = `Survey Site Lon DD`,
+         Species = `Fish Species Name`,
+         Number_caught = `Number Caught`,
+         Effort = `Effort Hours`) %>% # rename columns
+  filter(Water_site_survey_ID != 35947 & Water_site_survey_ID != 35971)  %>% # remove duplicate surveys
+  mutate(Date = mdy_hm(`Site Date`)) %>% # Convert Site Date to date format
+  select(-c(`Site Date`)) %>% 
+  # filter(Species == "Largemouth Bass") %>% # Select Largemouth bass
+  rename_with(tolower) # make all column names lower case
+  
+  
+# str(dat_clean)
+# head(dat_clean, 20)
+
+# Calculate total catch for each year, survey, and species
+dat_tot_catch <- dat_clean %>% 
+  group_by(year, water_site_survey_id, species) %>% # group data 
+  mutate(total_catch = sum(number_caught)) %>% # sum over catch for each variable in group_by
+  ungroup() %>% # ungroup data
+  distinct(year, water_site_survey_id, species, .keep_all=TRUE) %>% # retain distinct combos since we don't need size-specific numbers here
+  select(-c(number_caught)) # remove number caught, no longer needed
+
+
+# Species that were not caught in a given survey and year are not recorded as zero catch,
+# but we would like to do so. Thus, we have to input missing species names into surveys
+# and years where they were not recorded and give them a zero catch values
+
+dat_tot_catch2 <- dat_tot_catch %>% 
+  select(water_site_survey_id, year, species, total_catch, effort) %>% # Select columns of interest for summarizing
+  complete(nesting(water_site_survey_id, year), species,  fill = list(total_catch=0)) %>% # Input missing species for surveys and years
+  arrange(year, species) # sort by year and species
+
+# Look at first few rows of tot_catch2
+# head(dat_tot_catch2, 30)
+
+
+# Lets replace the NA values for imputed species efforts to the actual effort of the survey
+dat_tot_catch2 <- dat_tot_catch2 %>% 
+  group_by(water_site_survey_id) %>% 
+  mutate(effort = replace_na(mean(effort, na.rm=T))) %>% 
+  ungroup()
+
+# tail(dat_tot_catch2, 30)
+
+# Summarize mean catch (across surveys for each year and species)
+# sample size, and mean effort.
+table1 <- dat_tot_catch2 %>% 
+  group_by(year, species) %>% 
+ summarize(n = n(), total_catch = sum(total_catch, na.rm=T),
+           total_effort = sum(effort, na.rm=T)) %>% 
+  arrange(year, species)
+
+
+```
+
+## Getting started
+
+Open **R** from the `.proj` file associated with this workshop (`R_Workshop.Rproj`) and navigate to the `07_Exercises` --\> `Ex_2` folder and open the `exercise_2.R` script. This script contains all the code from Exercise \# 1 and you will start Exercise \# 2 at the end of that code.
+
+## The dataset
+
+The dataset is the same as used for Exercise #1. This exercise will map out our study site and plot the data summary we created (i.e., plot the data frame called `table1`). If you recall, `table1` contained the total catch and total effort for each species and year. We will want to visualize catch-per-unit effort time series for select species. The **R** chunk below shows the first few rows of `table1`.
+
+```{r}
+head(table1, 15)
+```
+
+## Create a map showing Mauch Chunk Lake
+
+This is a very simple illustration of making a map in **R**, but highlights the basic steps of map creation using the `sf` package (the preferred mapping package) along with `ggplot2` - the preferred package for creating figures/graphics.
+
+### Basic mapping steps
+
+1.  Convert the data frame (that contains lat/long coordinates) to a spatial object - a simple features (`sf`) object in this case.
+
+2.  Set the desired coordinate references system (crs).
+
+3.  Use `ggplot` and the `geom_sf` geometric object(s) to create a map.
+
+4.  Add any additional desired layers to customize/improve aesthetics of map.
+
+For this example, we only have a single site to map (a single lat/long). The lat/long coordinates for Mauch Chunk Lake are in the original data frame we read into **R** and also in the data frame `dat_tot_catch` we created. Because the lat/long coordinates are repeated for every row in the dataset, we can just select a single row of `dat_tot_catch` for this map. The following code for selecting the first row can be used, where we use square bracket indexing (\[rows,columns\]) to indicate we want the first row and all columns (`[1, ]`) -- leaving the second index for columns empty indicates to select *all* columns.
+
+```{r}
+# Subset first row and all columns (designated as [1,]) of dat_tot_catch
+map_dat <- dat_tot_catch[1,]
+# Look at map_dat
+map_dat
+
+```
+
+Again, for simply mapping a single lat/long coordinate, all we really care about in `map_dat` is the lat/long columns. However, if we were plotting multiple sites, the steps we are using are exactly the same.
+
+As of now, `map_dat` is still a data frame (among other data classes).
+
+```{r}
+class(map_dat)
+```
+
+We need to convert `map_dat` to a `sf` object using the `st_as_sf` function and the following code. We need to specify which data frame we are converting, what columns in `map_dat` contain lat/longs, and the desired crs.
+
+```{r}
+# Convert map_dat to a spatial (sf) object (simple feature)
+# and set its coordinate references system (crs)
+# crs = 4326 = WGS84; WGS84 CRS is often used for lat and long positions
+map_dat <- st_as_sf(map_dat, coords = c("long", "lat"), crs = 4326)
+class(map_dat)
+```
+
+Looking at the class of map_dat, we can now see that it is an `sf` object. Obviously, we don't just want a single lat/long point floating out in space, so we will want to add at least one additional layer to our map -- in this case it will be the state of PA. You can easily read in shapefiles or other spatial data into **R**; however, some packages have spatial data we can easily access for mapping. We will use the `spData` package to grab a polygon for the state of PA. The below **R** chunk illustrates the steps to do this.
+
+```{r}
+# Grab state boundaries from the spData package (called us_states) and
+# transform them to our desired coordinate references system (crs)
+# crs = 4326 = WGS84; WGS84 CRS is often used for lat and long positions.
+# We will call this new transformed state sf object "us_states2".
+us_states2 <- st_transform(us_states, crs = 4326)
+# Rename column to "State" in our object us_states2
+colnames(us_states2)[2] <- "State"
+# Select state(s) of interest - place them in a vector (can be > 1 state)
+selectStates <- c("Pennsylvania")
+# Subset us_states2 data to grab our selectStates for plotting
+# The %in% syntax is matching what is in us_states2$State with
+# what is in selectStates (i.e., Pennsylvania, in this case)
+us_state_select <- us_states2[us_states2$State %in% selectStates, ]
+```
+
+Now we have our lat/long point for Mauch Chunk Lake in the sf object `map_dat` and our polygon of PA in our `sf` object `us_state_select`. We can use the `ggplot` along with `geom_sf` to add our spatial data as follows:
+
+```{r, echo=TRUE}
+# Create map of PA (us_state_select) and our single point
+# for Mauch Chunk Lake (map_dat)
+ggplot() +
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=map_dat, shape=16, size = 5, colour="red") +
+  labs(title="Mauch Chunk Lake", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+```
+
+## Plot catch-per-unit effort over time
+
+For this plotting example, we will use the `table1` summary we created in Exercise \# 1 (**R** chunk below).
+
+```{r}
+head(table1, 5)
+```
+
+We will start with plotting a time series of catch-per-unit effort for a single species. We will focus on largemouth bass. Let's look at the class for `table1`.
+
+```{r}
+class(table1)
+```
+
+Notice that one of the class types is `grouped_df` -- a grouped data frame. If you recall from Exercise \# 1, we usually want to ungroup our data frames after they are grouped to perform some calculations/summaries. In this case, we did not ungroup `table1`, but we will want to do so before getting this data frame in shape for plotting. Recall that we can use the `ungroup()` function to do this.
+
+The **R** code to prep our data for plotting a time series of largemouth bass (lmb) catch-per-unit effort is as follows. We will call our new data frame for plotting `dat_lmb_plot`.
+
+```{r}
+dat_lmb_plot <- ungroup(table1) %>% 
+  filter(species == "Largemouth Bass") %>% 
+  mutate(cpe = total_catch/total_effort) %>% 
+  complete(year = min(year):max(year))
+
+```
+
+Notice the sequence of operations:
+
+1.  ungroup `table1`
+
+2.  Filter (select) data for when species is euqal to "Largemouth Bass" -- our focal species we want to plot
+
+3.  Calculate catch-per-unit effort and call it `cpe`
+
+4.  Fill in years that were not sampled so we can plot a complete time series
+
+We can then use the following `ggplot` code for our figure:
+
+```{r}
+# Plot cpe over time
+ggplot(data=dat_lmb_plot, aes(x=year, y=cpe)) +
+  geom_bar(stat="identity", width=0.5) +
+  labs(title="", y="CPE (fish/hr)", x="Year") +
+  theme_bw() +
+  scale_x_continuous(breaks=seq(1981,2022,5))
+```
+
+### Plot catch-per-unit effort for multiple species
+
+Task: your task is to use the previous two code chunks and modify them to make a plot showing catch-per-unit effort time series for three species.
+
+Details:
+
+1.  The focal species are Largemouth Bass, Smallmouth Bass, and Walleye
+
+2.  To make a multi-panel plot in `ggplot` we can use the following syntax:
+
+```{r, eval=FALSE, echo=TRUE}
+  facet_wrap(~species, scales = "free_y") 
+```
+
+Where the `~species` indicates we want a separate panel for each species time series and `scales="free_y"` indicates that each panel will have its own y-axis range.
+
+The final figure will look like this:
+
+```{r, echo=FALSE}
+# Select data for multiple species
+dat_spp_plot <- ungroup(table1) %>% 
+  filter(species == "Largemouth Bass" | species == "Smallmouth Bass" |
+           species == "Walleye") %>% 
+  mutate(cpe = total_catch/total_effort) %>% 
+  complete(nesting(species), year = min(year):max(year))
+
+# Plot cpe over time for multiple species
+ggplot(data=dat_spp_plot, aes(x=year, y=cpe)) +
+  facet_wrap(~species, scales = "free_y") +
+  geom_bar(stat="identity", width=0.5) +
+  labs(title="", y="CPE (fish/hr)", x="Year") +
+  theme_bw() +
+  scale_x_continuous(breaks=seq(1981,2022,5)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))
+```

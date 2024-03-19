@@ -1,0 +1,521 @@
+---
+title: |
+  ![](R_logo.png){width=1.0in}\linebreak\linebreak
+  Workshop 
+subtitle: "Exercise # 4: Temporal trends in fantail darter abundance"
+
+format: pdf
+editor: visual
+geometry:
+      - top=25.4mm
+      - left=25.4mm
+      - right=25.4mm
+      - bottom=25.4mm
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+# Load R packages
+library(dplyr) # data management
+library(tidyverse)
+library(ggplot2) # plot
+library(lubridate) # dates
+library(stringr) # manipulate character stings
+library(sf) # map creation
+library(spData) # spatial data
+library(car)  # logit function
+library(qs) # save and read in large files
+library(cmdstanr) # Bayesian estimation using stan
+library(rstanarm) # Bayesian models using R functions and stan
+library(mcmcplots) # as.mcmc function
+library(ggrepel)
+library(kableExtra) # tables
+library(ggmap) # Google API data
+library(bayesplot)
+```
+
+## Goal
+
+```{r, echo=FALSE, eval=TRUE}
+# Read in data
+# Read in data
+dart_dat <- read_csv("../../02_Data/Fischer_data/fantaildarter.csv")
+
+dart_dat <- dart_dat %>% 
+  select(RecordID, Date, County, Basin, N_Detected, Lat, Long, HUC_8, HUC_12) %>% 
+  mutate(Date = mdy(Date),
+         year = year(Date),
+         County = factor(County),
+         Basin = factor(Basin),
+         HUC_8 = factor(HUC_8),
+         HUC_12 = factor(HUC_12)) %>% 
+  filter(!is.na(N_Detected)) %>% 
+  rename_with(tolower) # make all column names lower case
+
+# Sample size per HUC 8
+huc_subset <- dart_dat %>% 
+  group_by(huc_8) %>% 
+  summarize(n = n()) %>% 
+  arrange(-n)
+
+huc_subset$n = cell_spec(huc_subset$n, color = ifelse(huc_subset$n > 50, "red", "darkgray"))
+
+```
+
+The goal of this exercise is to gain experience fitting a Bayesian hierarchical model using the `rstanarm` package and to practice using **R** functions learned during the workshop. The model will be a varying intercept, varying slope regression model.
+
+## The dataset
+
+For this exercise we will model catch of the fantail darter sampled at multiple locations and across years in PA. Specifically, we are interested if there are trends in fantail darter catch (I will refer to the catch as "abundance" [N] even though the data do not represent actual abundance estimates). However, we are not interested in trends at any given site -- there is not enough data to make site-specific inferences, rather we are interested if there are trends at the HUC 8 watershed level. This will also allow us to assess if there is spatial variability in these "regional" trends. 
+
+### HUC 8 data summaries
+
+There are a total of `r length(unique(dart_dat$huc_8))` HUC 8 watersheds in our data set. However, the sample size per HUC varies substantially. The number of observations per HUC ranges from 1 to 345. Table 1 shows the sample size per HUC for 15 HUCs sorted based on sample size. **We will retain the HUCs that have > 50 observations** (shown in red in Table 1; note that this is a purely arbitrary cutoff for the purpose of the exercise). The time-frame of this data set ranges from 1933 -- 2013; however, no HUCs have samples in every year.
+
+```{r, echo=FALSE, eval=TRUE}
+
+# Create table
+huc_subset[1:15,] %>%
+  kbl(booktabs = TRUE, digits=1, escape = FALSE,caption = "Summary of observations per HUC 8",
+      col.names = c("HUC 8", "Number of observations")) %>%
+  kable_paper(full_width = FALSE) 
+```
+
+{{< pagebreak >}}
+
+## Getting started
+
+1.  Open **R** from the `.proj` file associated with this workshop (`R_Workshop.Rproj`), create a new R script, and save it (give it name of your choice) to the folder called *Ex_4* located in the folder *07_Exercises*. To create a new script, follow File --\> New File --\> R Script.
+
+2. Load **R** packages. You can just copy-and-paste these from the `exercise_3.R` script, but they are also listed below.
+
+
+```{r, eval=FALSE, echo=TRUE}
+library(dplyr) # data management
+library(tidyverse) # data management
+library(ggplot2) # plot
+library(lubridate) # dates
+library(stringr) # manipulate character stings
+library(sf) # map creation
+library(spData) # spatial data
+library(car)  # logit function
+library(qs) # save and read in large files
+library(cmdstanr) # Bayesian estimation using stan
+library(rstanarm) # Bayesian models using R functions and stan
+library(mcmcplots) # as.mcmc function
+library(ggrepel)
+library(kableExtra) # tables
+library(bayesplot)
+```
+
+
+3. Read in the data using `read_csv`. The data set is called `fantaildarter.csv`. The data are located in the directory `02_Data/Fischer_data`. Name the data frame `dart_dat`.
+
+
+## Data cleaning/manipulation
+
+I will provide less code for this exercise. Refer to previous exercises if you need additional code guidance. Use pipes to accomplish the following:
+
+1. Select the following columns:
+
+```{r, echo=TRUE, eval=FALSE}
+RecordID, Date, County, Basin, N_Detected, Lat, Long, HUC_8, HUC_12
+```
+
+2. Change `Date` to a date data type.
+
+3. Convert `County`, `Basin`, `HUC_8`, `HUC_12` to factors.
+
+4. Remove any `NA` values in the column `N_Detected`
+
+5. Make all column names lower case.
+
+Your data frame should look like this:
+
+```{r}
+str(dart_dat)
+```
+
+::: {.callout-tip title="Try this!"}
+Try making a summary table of the number of observations per HUC 8 (similar to Table 1, but don't worry about color formatting etc.). We can use the `group_by()` and `summarize()` functions to accomplish this.
+:::
+
+```{r, echo=FALSE, eval=TRUE}
+# Summarize number of observations by HUC_8
+# Select HUC_8's with at least 50 observations
+dart_subset <- dart_dat %>% 
+  group_by(huc_8) %>% 
+  summarize(n = n()) %>% 
+  filter(n > 50) %>%  # retain those with > 5% prevalence and n > X
+  arrange(-n)
+
+dart_dat <- dart_dat %>% 
+  subset(huc_8 %in% dart_subset$huc_8) %>% 
+  mutate(log_n = log(n_detected+1)) %>% # log-transform N (add 1 for 0's)
+  droplevels()
+
+```
+
+
+## Subset HUCs
+As previously mentioned, we want to only retain those HUCs with > 50 observations. If you were able to summarize the data as in Table 1 (number of observations for each HUC) then we need to select those HUCs with > 50 observations by simply adding one more line of code piped in as follows (i.e., `filter(n > 50)`:
+
+```{r, eval=FALSE, echo=TRUE}
+dart_subset <- dart_dat %>% 
+  group_by(huc_8) %>% 
+  summarize(n = n()) %>% 
+  filter(n > 50) %>%  # retain HUCs with > 50 observations
+  arrange(-n) # we can sort by n as well
+```
+
+We now have a total of 10 HUCs with are desired sample size.
+
+```{r}
+dim(dart_subset)
+
+head(dart_subset)
+```
+
+Notice that `dart_subset` has 10 rows, one row for each HUC that met our sample size criterion. The next step is to select all the data from `dart_dat` for these 10 HUCs we identified in `dart_subset`. To accomplish this we can use handy syntax for selecting data from one data frame (i.e., `dart_dat`) that match the IDs (a vector of HUC 8 codes in our case) contained in another data frame (i.e., `dart_subset`). While we are at it, let's natural log transform abundance (`n_detected`) for use as our response variable in modeling. We need to add a constant to accommodate zero abundances during log-transformation. We will add a constant of 1 prior to log-transformation. The code is below:
+
+```{r, eval=FALSE, echo=TRUE}
+dart_dat <- dart_dat %>% 
+  subset(huc_8 %in% dart_subset$huc_8) %>% 
+  mutate(log_n = log(n_detected+1)) %>% # log-transform N (add 1 for 0's)
+  droplevels() # drop unused levels from a factor (i.e., the huc_8 IDs we removed)
+```
+
+::: {.callout-tip title="Useful subsetting syntax"}
+
+Note the syntax in the `subset()` function above. The first argument `huc_8` is referencing the `huc_8` column in our `dart_dat` data frame. The IN operator (`%in%` ) is checking if the values of the first vector (`huc_8` in `dart_dat`) are present in the second vector (`dart_subset$huc_8`) and returning a logical vector indicating if there is a match or not. This way we can select all the rows in `dart_dat` that have `huc_8` codes contained in `dart_subset$huc_8`.
+:::
+
+Our data frame `dart_dat` now only has data for our 10 target HUCs.
+
+```{r}
+unique(dart_dat$huc_8)
+```
+
+The structure of `dart_dat` is:
+
+```{r}
+str(dart_dat)
+```
+
+
+::: {.callout-tip title="Try this!"}
+Create a map of all the locations (lat/longs) of our sample sites after we subsetted the data. Make it however you want/can, but an example is in Figure 1.
+:::
+
+```{r, echo=FALSE, eval=TRUE}
+
+# Grab state boundaries from spData and
+# transform the coordinate references system (crs)
+# crs = 4326 = WGS84; WGS84 CRS is often used for lat and long positions
+us_states2 <- st_transform(us_states, crs = 4326)
+# Rename column
+colnames(us_states2)[2] <- "State"
+# Select state(s) of interest
+selectStates <- c("Pennsylvania")
+# Subset data for plotting
+us_state_select <- us_states2[us_states2$State %in% selectStates, ]
+
+map.dat <- st_as_sf(dart_dat, coords = c("long", "lat"), crs = 4326)
+
+```
+
+```{r, echo=FALSE, eval=TRUE}
+#| fig-cap: "Locations of sample sites after retaining HUC 8s with > 50 observations (n = 10 HUC 8s). Points are colored according the log(abundance)."
+# Create simple map
+ggplot() +
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=map.dat, shape=16, size = 1, aes(colour=log(n_detected+1))) +
+  labs(title=" ", y="Latitude", x="Longitude", color="log(N+1)") +
+  scale_color_gradientn(colours = rainbow(10)) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+```
+
+{{< pagebreak >}}
+
+## Temporal trends
+
+The next step is to fit a model to examine temporal trends in each HUC 8. Table 2 is a quick-and-dirty table summarizing our 10 HUC 8's, along with temporal dynamics based on annual average abundance.
+
+```{r, echo=FALSE, eval=TRUE}
+# Summary of the mean number of detects by HUC 8
+dart_tab1 <- dart_dat %>% 
+  group_by(huc_8) %>% 
+  summarize(mean_abundance = mean(n_detected))
+
+# Summary of mean number of detects by HUC and year
+dart_tab2 <- dart_dat %>% 
+  group_by(huc_8, year) %>% 
+  summarize(mean_logN = mean(log_n))
+
+# Create a list that has the number detected by year for each HUC 8
+dart_list <- split(dart_tab2$mean_logN, dart_tab2$huc_8)
+
+# Add a new column to dart_tab1 that will contain our time trend of detections
+# in the table
+dart_tab1 <- data.frame(dart_tab1, "Trend" = " ")
+
+# Create table
+dart_tab1 %>%
+  kbl(booktabs = TRUE, digits=1, caption = "Summary of fantail darter mean abundance and temporal trends.", 
+      col.names = c("HUC 8", "Mean abundance", "Temporal trend (log[N])")) %>%
+  kable_paper(full_width = FALSE) %>%
+  column_spec(3, image = spec_plot(dart_list, same_lim = TRUE, minmax = list(),
+                                   col = "black",width = 500,
+                                   height = 80)) 
+
+```
+
+We can see from Table 2 that HUC 8s vary in average abundance and temporal dynamics are variable. We can also plot the actual data (not taking annual means) as shown in Figure 2.
+
+
+
+```{r, echo=FALSE, eval=TRUE}
+#| fig-cap: "Fantail darter abundance over time for 10 HUC 8 watersheds."
+#| fig-pos: '!htb'
+# Plot data
+ggplot(data = dart_dat, mapping = aes(x=year, y=log_n) )+ 
+  facet_wrap(~huc_8) +
+  geom_point(alpha=0.3) + 
+  theme_bw() +
+  theme(axis.text = element_text(size = 9),
+        axis.title = element_text(size = 9),
+        strip.text.x = element_text(size=9)) +
+  theme(plot.margin = margin(0, .5, .5, .5, "cm")) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0.5)) +
+  scale_x_continuous(breaks=seq(1934,2013,10)) +
+  labs(title="", y="log(N)", x="Year") 
+```
+
+{{< pagebreak >}}
+
+### The statistical model
+
+We will fit a simple trend model and investigate the presence of monotonic (linear) trends in abundance among HUCs.
+
+The model is as follows:
+$$
+y_i \sim N \left(\alpha_{j(i)} + \beta_{j(i)} \cdot x_i,\sigma^2 \right) , \text{for}\; i,\ldots n 
+$$
+
+$$
+\begin{pmatrix} \alpha_j \\ \beta_j \end{pmatrix} \sim MVN \left(\begin{pmatrix}\mu_\alpha \\ 
+\mu_\beta \end{pmatrix},\begin{pmatrix} \sigma_\alpha^2 & \sigma_{\alpha\beta}\\ \sigma_{\alpha \beta} & \sigma_\beta^2  \end{pmatrix}\right),  \textrm{ for } j = 1, \ldots J
+$$
+
+
+In this model, $y_i$ is the $log_e$-transformed fantail darter abundance for site $i$, and $x_i$ is the standardized (mean = 0, SD = 1) year predictor variable. Again, it is good practice to standardize all predictors prior to analysis such that all variables have a mean of zero and a standard deviation of one. Standardizing not only facilitates parameter interpretation, but will also aid in the convergence of hierarchical models. The parameters $\alpha_j$ and $\beta_j$ are HUC 8-specific intercepts and slopes, and $\sigma^2$ is the model error term variance. The HUC-specific intercepts and slopes are assumed to come from a multivariate normal distribution (MVN), where $\mu_\alpha$ and $\mu_{\beta}$ are the population-average intercept and slope parameters describing the average temporal trend across all data and HUCs. The parameters $\sigma_\alpha^2$, $\sigma_\beta^2$, and $\sigma_{\alpha\beta}$ are the variances among intercepts and slopes, and the covariance, respectively. We will use default priors in `stan_glmer` when we fit this model. In terms of inferences about temporal trends, the $\beta_j$ parameters will tell us about HUC-specific trends and $\mu_{\beta}$ gives us an estimate of the overall trends, across all HUCS.
+
+### Fitting the model 
+
+We will use the `stan_glmer` function to fit this model. The code is in the following **R** chunk. Note that we will first standardized (mean = 0, SD = 1) the `year` predictor variable and call it `z_year`. 
+
+```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, results='hide'}
+# Standardize year predictor
+dart_dat <- dart_dat %>% 
+  mutate(z_year = as.numeric(scale(year)))
+  
+######## ---------------------------------
+# Fit varying intercept and slope model
+m1 <- stan_glmer(formula = log_n ~ 1 + z_year + (1 + z_year | huc_8), 
+                 family = gaussian,
+                 data = dart_dat,
+                 iter = 1500, chains = 3)
+# print(m1, digits=3)
+```
+
+The random effects part of the model is contained in the `(1 + z_year | huc_8)`, where `1` indicates a varying (random) intercept, `z_year` indicates a varying slope for `z_year` and `| huc_8` indicates that the intercepts ($\alpha_j$) and slopes ($\beta_j$) vary according to HUC 8. The fixed intercept ($\mu_\alpha$) and slope ($\mu_\beta$) are identified in `~ 1 + z_year`. 
+
+This model may take several minutes to fit, depending on your CPU. 
+
+### Model convergence
+
+```{r, echo=FALSE}
+posterior <- as.array(m1)
+```
+
+
+Examine trace plots for a few parameters (we would want to look at all trace plots.)
+```{r, echo=FALSE}
+#| fig-cap: "Trace plots for population-average parameters."
+
+mcmc_trace(posterior, pars = c("(Intercept)", "z_year"))
+```
+
+Table 3 contains posterior summaries for all parameters. 
+
+### Trend inferences
+
+```{r, echo=FALSE, eval=TRUE}
+# Prepare MCMC summary stats for a table
+sum1 <- summary(m1, probs = c(0.025, 0.975), digits=2)
+sum1 <- data.frame(sum1[-c(27, 28),c(1,3:5)] )
+sum1$parameter <- rownames(sum1)
+rownames(sum1) <- NULL 
+
+# Summary for table
+sum1[-c(27, 28),c(5,1:4)] %>% 
+  kbl(caption = "Posterior summaries", booktabs = TRUE, digits=2,
+      col.names = c("Parameter",
+                    "Posterior mean",
+                    "SD",
+                    "Lower 95% CI",
+                    "Upper 95% CI")) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>% 
+  kable_styling(latex_options=c("striped","scale_down"))
+```
+
+
+
+The population-average estimated temporal trend is negative ($\mu_\beta$ = -0.059), but the 95% credible interval overlaps with zero (95% credible interval = -0.250, 0.113). The posterior probability of a negative population-average trend is 0.76.
+
+
+### Visulaize HUC 8-specific model fits and trends
+
+Figure 4 shows the HUC-specific trends. We can see that trends (direction and magnitude) vary across HUCs and that support of a decline (represented by the posterior probability of $\beta_j$ <0) also varys.
+
+```{r, echo=FALSE, eval=TRUE}
+
+# Grab mcmc draws for selected parameters
+fits <- m1 %>%
+  as_tibble() %>%
+  rename(intercept = `(Intercept)`) %>%
+  select(-starts_with("Sigma") ) # exclude the estimated variances
+
+
+############ Function to sum to get random intercept and slopes
+shift_draws <- function(draws) {
+  sweep(draws[, -1], MARGIN = 1, STATS = draws[, 1], FUN = "+")
+}
+###################################
+
+# Extract intercept and random huc_8 intercepts and add them together
+ints <- fits %>%
+  select(intercept, starts_with("b[(Intercept)"))
+# Calculate  huc_8 specific intercepts
+huc_ints <- shift_draws(as.matrix(ints))
+
+
+# Extract slope and random huc_8 slopes and add them together
+slopes <- fits %>%
+  select(z_year, starts_with("b[z_year"))
+# Calculate  huc_8 specific intercepts
+huc_slopes <- shift_draws(as.matrix(slopes))
+
+
+# Create predicted regression line and uncertainty for each HUC_8
+
+##############################
+# ### BEGIN plotting code
+# Create numeric HUC indicator for plotting
+dart_dat <- dart_dat %>% 
+  mutate(huc_8_id = as.numeric(huc_8)) %>% 
+  arrange(huc_8_id)
+
+# Number of hucs
+J <- max(dart_dat$huc_8_id)
+
+# Get range of year predictor for each huc
+z_year_range <- list()
+for(i in 1:J){
+  z_year_range[[i]] <- seq(min(dart_dat$z_year[dart_dat$huc_8_id==i]), max(dart_dat$z_year[dart_dat$huc_8_id==i]), length.out = 30)
+}
+
+
+# Container for predicted values for each group (i.e., each HUC)
+linPredGroup  <- array(NA, c(dim(huc_ints)[1],length(z_year_range[[1]]),J)) 
+# dim(linPredGroup)
+
+# Put each groups MCMC draws for all parameters in its own list
+group.ints <- list()
+group.slopes <- list()
+for(m in 1:J){
+  group.ints[[m]] <- huc_ints[,m]
+  group.slopes[[m]] <- huc_slopes[,m]
+}
+
+
+for(p in 1:J){ # loop over groups (J)
+    for(t in 1:length(z_year_range[[1]])){
+      linPredGroup[ ,t,p] <- group.ints[[p]] + group.slopes[[p]] * z_year_range[[p]][t] 
+    }	  
+}
+
+# dim(linPredGroup)
+# Create containers
+# Store posterior means
+meanProbGroup <- array(NA, c(length(z_year_range[[1]]),J) )
+# Store CIs
+upperCI.Group <- array(NA, c(length(z_year_range[[1]]),J) )
+lowerCI.Group <- array(NA, c(length(z_year_range[[1]]),J) )
+
+for(i in 1:J){
+  # Means
+  meanProbGroup[,i] <- apply(linPredGroup[,,i], 2, mean )
+  # 95% CIs for fitted values
+  upperCI.Group[,i] <- apply(linPredGroup[,,i], 2, quantile, probs=c(0.975) )
+  lowerCI.Group[,i] <- apply(linPredGroup[,,i], 2, quantile, probs=c(0.025) )
+}
+
+#######################GGPLOT####################
+# New data frame for plotting (not really necessary)
+toplot <- dart_dat 
+# If you use this scale it cuts out a few points from the graph
+Ymin <- 0
+Ymax <- max(dart_dat$log_n)
+
+# Make a dataframe for lines
+# x-values in z_year_range
+for(i in 1:J){
+  temp.data=data.frame("huc_8_id"=i,"z_year"=z_year_range[[i]], log_n=meanProbGroup[,i])
+  if(i==1) line.plot=temp.data else line.plot=rbind(line.plot, temp.data)
+  temp.CIs=data.frame("huc_8_id"=i,"z_year"=z_year_range[[i]], "lower"=lowerCI.Group[,i],"upper"=upperCI.Group[,i])
+  if(i==1) ci.line.plot=temp.CIs else ci.line.plot=rbind(ci.line.plot,temp.CIs)
+}
+
+# New lables for facets
+site.labs <- as.character(unique(dart_dat$huc_8) )
+names(site.labs) <- c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+
+# Function for passing through apply to get
+# posterior probs of a decline
+post_prob <- function(x){
+  mean(x < 0)
+}
+# Posterior prob of negative trend
+slope_probs <- apply(huc_slopes, 2, post_prob)
+slope_probs <- as.vector(slope_probs)
+# Create data frame required for adding probs in a facet for ggplot
+slope_probs_plot <- data.frame(huc_8_id = 1:10, probs = slope_probs)
+
+```
+
+```{r, echo=FALSE, eval=TRUE}
+#| fig-cap: "HUC-specific trends in fantail darter abundance. Fitted line is the posterior mean and shaded area is 95% credible region. Numbers are the posterior probability of a negative trend in abundance."
+#| 
+# Plot
+ggplot() +
+  geom_point(data=dart_dat, aes(z_year, log_n),colour="blue", size=.5) + 
+  facet_wrap(~huc_8_id, labeller = labeller(huc_8_id = site.labs)) +
+  theme_bw() +
+  scale_y_continuous(limits = c(Ymin, Ymax)) +
+  geom_line(data=line.plot, aes(z_year, log_n), lwd=1) +
+  geom_ribbon(data=ci.line.plot, aes(x=z_year, ymax=upper, ymin=lower), fill="grey", alpha=.75) +
+  theme(panel.grid = element_blank(),strip.background = element_blank()) +
+  xlab("Year (standardized)")+
+  ylab(expression(paste(log[e],'(N)' ))) +
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 10),
+        strip.text.x = element_text(size=10)) +
+  geom_text(aes(x=-3, y=5, label = round(probs, digits = 2)), data=slope_probs_plot) # add post probs
+
+
+```
+
+
