@@ -1,0 +1,1073 @@
+---
+title: "Introduction to R"
+author: "Ty Wagner"
+institute: "PACFWRU, Penn State University"
+date: today
+format:
+  revealjs:
+    highlight-style: github
+    slide-number: c/t
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(dplyr) # data management
+library(tidyverse)
+library(ggplot2) # plot
+library(lubridate) # dates
+library(bslib) # a modern UI toolkit for Shiny and R Markdown 
+library(stringr) # manipulate character stings
+library(sf) # map creation
+library(spData) # spatial data
+library(car)  # logit function
+library(ggmap) # Use Google Map services
+```
+
+## An Introduction to
+
+![](Rlogo.png){fig-align="center" width="400" height="400"}
+
+## What is R?
+
+-   R is an environment for statistical computing and graphics
+
+-   Widely used in scientific and quantitative research
+
+-   Freely available and has extensive functionality
+
+-   Background on R and documentation can be found on the R Project website <https://www.r-project.org/>
+
+::: {layout-ncol="3" layout-valign="top"}
+![](Fig1_pga.png){width="250" height="250"}
+
+![](Fig2_maps.png){width="300" height="300"}
+
+![](Fig3_map.png){width="300" height="300"}
+:::
+
+## RStudio IDE
+
+-   An integrated development environment (IDE) for R
+
+-   <https://posit.co/products/open-source/rstudio/>
+
+-   Allows you to organize your work into projects, create documents, presentations, webpages, etc. (this presentation was made using RStudio)
+
+-   You will want to download and install the latest versions of R and RStudio
+
+## Other resources
+
+-   *Google*
+
+-   *R-bloggers*: a blog aggregator of content contributed by bloggers who write about R; <https://www.r-bloggers.com/>
+
+-   *Stackoverflow*: a public platform for asking questions and finding answers related to R; <https://stackoverflow.com/questions/tagged/r>
+
+## R packages 📦
+
+-   The *base* installation of R includes many functions and commands
+
+-   However, you will need to access additional functionality encoded into **packages** contributed by the R developer community
+
+## R packages 📦
+
+-   Can download directly from within RStudio
+-   Contain help files and often include data and examples
+-   Downloaded from CRAN (Comprehensive R Archive Network)
+
+![](ggplot.png)
+
+## R packages 📦
+
+Can also download from the R console
+
+```{r, echo=TRUE, eval=FALSE}
+# Install the R package ggplot2
+install.packages("ggplot2")
+```
+
+Some packages are only available to download from [GitHub](https://github.com) - a large platform for programmers to store and share code. Install instructions will often be provided on the GitHub landing page, but will often be something like:
+
+```{r, echo=TRUE, eval=FALSE}
+# Install the 'devtools' package first
+install.packages("devtools")
+
+# Then install the package from GitHub
+devtools::install_github("ddauber/package_name")
+```
+
+## Some useful R packages to get started with:
+
+```{r, echo=TRUE}
+library(dplyr) # data management
+library(tidyverse) # data workflow
+library(ggplot2) # plotting: both figures and maps
+library(lubridate) # working with dates
+library(bslib) # a modern UI toolkit for Shiny and R Markdown 
+library(stringr) # manipulate character stings
+library(sf) # map creation, works with ggplot
+library(spData) # spatial data
+library(car)  # logit function
+```
+
+## Using R packages
+
+-   You only need to download R packages once, but you need to 'load' them in each R session that you work on
+
+To load R packages you simply use the *library* function with the name of the R package in parentheses:
+
+```{r, echo=TRUE, eval=FALSE}
+library(ggplot2)
+library(dplyr)
+```
+
+It is good practice to load all your R packages at the very beginning of your R script
+
+## Unlocking the power of R 🔐
+
+-   Basic computation
+
+```{r}
+# Perform basic arithmetic operations
+
+2 + 2
+
+5 - 3
+
+6 * 6
+
+50/2
+
+10^2
+
+```
+
+## Executing simple *base* functions
+
+```{r}
+# Square root
+sqrt(45)
+
+# Logarithms (natural log)
+log(4.5)
+
+# Base 10
+log10(4.5)
+
+
+
+```
+
+## The Assignment Operator: **\<-**
+
+-   Assigns values to an object (data class)
+
+::: incremental
+-   An object can be:
+
+    -   Numerical value
+
+    -   Data set (data frame)
+
+    -   Vector, matrix, array
+
+    -   Function
+
+    -   Model output
+
+    -   List
+:::
+
+## The Assignment Operator: **\<-**
+
+```{r}
+# Assign the value of 5 to object named x
+x <- 5
+
+# Assign the value of 2 times x to the object y
+y <- 2 * x
+```
+
+Note that R is case sensitive: y ⧣ Y
+
+Created objects can be used in other operations and to define new objects
+
+```{r}
+my_answer <- x * y
+my_answer
+```
+
+These new objects can be used in functions
+
+```{r}
+log(my_answer)
+```
+
+## R object types (data classes)
+
+Vectors and Arrays
+
+::: incremental
+-   **Vector**: a one-dimensional array, all elements of a vector must be of the same type (numerical or character)
+
+-   **Matrix**: a two-dimensional array with rows and columns (numeric or character)
+
+-   **Array**: as a matrix, but of arbitrary dimension
+:::
+
+## Vectors and Arrays
+
+We can apply operations and functions to each element of an R object, such as a vector
+
+```{r}
+# Create a vector of fish lengths
+fish_lengths <- c(115, 226, 305, 95, 445)
+fish_lengths
+# Take natural log of fish lengths
+log_fish_lengths <- round(log(fish_lengths), 2)
+log_fish_lengths
+```
+
+We can also apply functions or operations to the entire vector
+
+```{r}
+# Calculate mean length
+mean_fish_lengths <- mean(fish_lengths)
+mean_fish_lengths
+```
+
+## Vectors and Arrays
+
+We can easily subset vectors and arrays using subscripts `[]`
+
+```{r}
+# Create a vector of fish lengths
+fish_lengths <- c(115, 226, 305, 95, 445)
+fish_lengths
+# Grab first 3 lengths
+subset1 <- fish_lengths[1:3]
+subset1
+# Grab 1st, 3rd, and last length
+subset2 <- fish_lengths[c(1,3,5)]
+subset2
+```
+
+## Vectors and Arrays
+
+Let's do the same for a 2-D array (a matrix)
+
+```{r}
+# Create a matrix of random numbers
+set.seed(1234) # set a seed so we get the same random numbers each time we run this
+mymatrix <- matrix(rnorm(15), nrow = 5, ncol = 3)
+mymatrix
+# Subset the first column
+s1 <- mymatrix[,1]
+s1
+
+```
+
+## Vectors and Arrays
+
+Let's do the same for a 2-D array (a matrix)
+
+```{r}
+# Subset the first and last column
+s2 <- mymatrix[,c(1,3)]
+s2
+# Subset first row
+s3 <- mymatrix[1,]
+s3
+# Subset first 2 rows and first and last column
+s4 <- mymatrix[1:2, c(1,3)]
+s4
+```
+
+## Vectors and Arrays
+
+We can do the same for character values
+
+```{r}
+lake_names <- c("Round lake", "Sparkle Lake", "Deep Lake", "Mud Lake")
+s5 <- lake_names[c(1,3)]
+s5
+```
+
+We can use logical values in subsetting too
+
+```{r}
+# Create logical vector indicating if a lake is invaded with zebra mussels
+invaded <- c(FALSE, TRUE, TRUE, FALSE)
+lake_names[invaded]
+```
+
+## R object types
+
+**Data frames**
+
+-   2-D array like structure (rows and columns)
+
+-   Similar to a spreadsheet of data
+
+-   Can be a mix of variable types (some columns numeric and some character or date, etc.)
+
+-   The fundamental data structure by most of R's modeling functions
+
+-   Typically we read data from a .txt or .csv file into a data frame object for analysis, plotting, etc.
+
+## R object types
+
+**List**: R objects which contain elements of different types, including vectors, arrays, data frames, etc.
+
+```{r}
+mylist <- list(c("Brook trout","Smallmouth bass","Flathead catfish"), matrix(rnorm(10), nrow = 5, ncol=2),
+               c(as.Date("2023-01-31"), as.Date("2021-05-21")))
+
+mylist
+```
+
+## Getting started: creating R Projects
+
+-   R projects are a useful way to organize your R projects
+
+    -   All files (R scripts, data, functions, etc.) are located in a single project folder
+
+    -   Facilitates Open Science and sharing of code
+
+    -   Facilitates interacting with [GitHub](https://github.com) (for version control and collaboration)
+
+    -   Allows for the creation of other products: presentations, documents, books, etc.
+
+## Creating R projects
+
+-   Create a project by: `File` ➡️ `New Project...`
+
+![](p1.png){fig-align="center" width="400" height="400"}
+
+## Creating R projects
+
+![](p2.png){fig-align="center" width="450" height="450"}
+
+## Creating R projects
+
+![](p3.png){fig-align="center" width="450" height="450"}
+
+## Creating R projects
+
+-   Also useful to do the following: `Tools` ➡️ `Global Options...` uncheck these boxes
+
+![](g1.png){fig-align="center" width="450" height="450"}
+
+## R projects
+
+-   Organize your R projects with relevant directories 📂
+
+    -   scripts
+
+    -   data
+
+    -   figures
+
+    -   model_output
+
+    -   etc.
+
+## R projects - organize
+
+![](d1.png){fig-align="center" width="600" height="500"}
+
+## R scripts
+
+-   You will forget why you did what you did and/or what you did...and it's frustrating!
+
+![](farley1.gif){fig-align="center" width="400" height="400"}
+
+## R scripts
+
+-   Organization and comments are important
+
+-   Comments are added after hash mark `#`
+
+```{r}
+# This is an example of a comment in R. R will not execute this code
+```
+
+-   Load packages at the top of the script
+
+```{r, echo=TRUE, eval=FALSE}
+# Here I am loading packages
+# These comments are overkill, but you get the point
+library(ggplot2)
+library(dplyr)
+```
+
+## Create R scripts
+
+-   `File` ➡️ `New File` ➡️ `R Script`
+
+-   Save file with descriptive name in the appropriate project directory
+
+::: incremental
+-   **You are now ready to start using R!**
+:::
+
+## Importing data
+
+-   There are several functions that can be used to import data
+
+    -   Data: spreadsheets (flat tables), spatial data (shapefiles, rasters)
+
+    -   Can be many different formats: `.txt`, `.csv`, `.rds`, `feather`, etc.
+
+-   Typically, we read in data as `.csv` files
+
+-   A useful function for reading in `.csv` files is [tidyverse::read_csv]{style="font-family: 'Courier New'"}
+
+## Import example data 🐟
+
+```{r}
+fhc_dat <- read_csv('../02_data/FHC_length_weigtht.csv')
+str(fhc_dat) # display structure of R object
+```
+
+## Pipe operator in R `%>%` or `|>`
+
+-   `%>%` is a pipe operator provided by the magrittr [magrittr]{style="font-family: 'Courier New'"} package
+
+-   `|>` is a simple native forward pipe syntax
+
+-   Differences between these can be found [here](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/) and [here](https://www.r-bloggers.com/2021/05/the-new-r-pipe/)
+
+    -   A few differences are: using `|>` uses one less package, `|>` might be faster computationally, to most of us the differences are negligible and the choice is yours
+
+-   We will use `%>%`
+
+## Pipes
+
+-   We always need to perform data manipulations after importing data into R
+
+::: incremental
+-   Data manipulations require several steps
+
+    -   Subset data
+
+        -   Select/remove certain observations, rows, columns
+
+    -   Change a data type (e.g., numeric, character, factor, etc.)
+
+    -   Transform data (e.g., log-transform)
+:::
+
+## Pipe operator in R `%>%`
+
+-   You can do these steps one at a time, but we can more efficiently "chain" these steps together - where the intermediate result from one function is passed into the next function
+
+-   Pipes help increase the readability of your code
+
+-   Easily add steps anywhere along the chain sequence
+
+## Pipe operator in R `%>%`
+
+-   Pipe basics
+
+```{r}
+x <- 10.6592
+# log function; f(x)
+log(x)
+
+# Use a pipe, so that f(x) is written as x %>%  f
+x %>% log()
+
+```
+
+The [log]{style="font-family: 'Courier New'"} function takes a single argument (in this case, x), but we can see how pipes are used for functions that take more than one argument
+
+## Pipe operator in R `%>%`
+
+-   The [round]{style="font-family: 'Courier New'"} function takes two arguments: [round(x, digits=0)]{style="font-family: 'Courier New'"}
+
+```{r}
+round(x, 3)
+
+# Use a pipe
+
+x %>% round(3)
+```
+
+## Back to our data
+
+```{r}
+head(fhc_dat, 3)
+```
+
+-   Let's clean this data set up
+
+    -   Rename some columns
+
+    -   Change some data types (Date, factors)
+
+-   We could do this one at a time, but let's chain these steps together using pipes
+
+## Data cleaning - rename
+
+```{r}
+# First, change column names that have spaces
+fhc_dat1 <-  fhc_dat %>% 
+  rename("fish_id" = `Fish ID`,
+         "length_mm" = `Length (mm)`,
+         "weight_g" = `Weight (kg)`,
+         "fin_clip" = `Fin Clip ( Y or N )`,
+         "liver_muscle" = `Liver/Muscle (Y or N)`)
+head(fhc_dat1, 3)
+```
+
+## Data cleaning - change data types
+
+-   Let's add to the previously written chain of commands - just add another pipe!
+
+```{r}
+fhc_dat2 <-  fhc_dat %>% 
+  rename("fish_id" = `Fish ID`,
+         "length_mm" = `Length (mm)`,
+         "weight_g" = `Weight (kg)`,
+         "fin_clip" = `Fin Clip ( Y or N )`,
+         "liver_muscle" = `Liver/Muscle (Y or N)`) %>% 
+  mutate(Date = mdy(Date), # mdy is from the lubridate package
+         fish_id = factor(fish_id),
+         Site = factor(Site),
+         log_length = log(length_mm),
+         log_weight = log(weight_g))
+head(fhc_dat2, 3)
+```
+
+## Commonly used data manipulation functions
+
+-   [rename()]{style="font-family: 'Courier New'"}: rename columns
+
+-   [mutate()]{style="font-family: 'Courier New'"}: create/modify new variables
+
+-   [filter()]{style="font-family: 'Courier New'"}: keep observations (rows) based on criteria
+
+-   [select()]{style="font-family: 'Courier New'"}: select specific columns (variables)
+
+-   [arrange()]{style="font-family: 'Courier New'"}: sort data by one or more variables
+
+## Commonly used data manipulation functions
+
+-   [group_by()]{style="font-family: 'Courier New'"}: aggregate data
+
+-   [summarise()]{style="font-family: 'Courier New'"}: summarize data
+
+-   [ifelse()]{style="font-family: 'Courier New'"}: create a variable based on condition
+
+-   [left_join()]{style="font-family: 'Courier New'"}: add columns from y to x, [left_join()]{style="font-family: 'Courier New'"} will keep all observations in x
+
+## Let's read in our 2nd flathead catfish data set
+
+```{r}
+site_dat <- read_csv('../02_data/FHC_site_info.csv')
+str(site_dat) # display structure of R object
+```
+
+## Site data clean-up
+
+```{r}
+# We just want the site name and lat/longs for mapping
+site_dat <- site_dat %>% 
+  select(site_name, lat, long) %>% 
+  mutate(site_name = factor(site_name)) 
+head(site_dat, 3)
+
+# Look at unique values of site_name
+levels(site_dat$site_name)
+
+# Site names in our fish data set
+levels(fhc_dat2$Site)
+```
+
+## Prepare to merge and merge data sets
+
+```{r}
+fhc_dat_merged <- fhc_dat2 %>% 
+  rename("site_name" = Site) %>% # rename so they match in each data set
+  select(-fin_clip, -liver_muscle) %>% # remove unwanted columns
+  mutate(site_name = recode_factor(site_name, "East Donegal"="East Donegal Township")) %>% # change factor level name
+  left_join(site_dat, by=c("site_name")) # merge
+head(fhc_dat_merged)
+dim(fhc_dat_merged)
+
+
+```
+
+## Plotting basics 📉
+
+[ggplot2]{style="font-family: 'Courier New'"} package
+
+-   [ggplot2]{style="font-family: 'Courier New'"} is based on **adding** plot "layers" using the `+` symbol
+
+-   Basic syntax for a ggplot object will often look like this:
+
+    -   Beging with [ggplot2]{style="font-family: 'Courier New'"} command
+        -   This 'opens' ggplot and allows for adding layers using `+`
+        -   The data set to use is often specified here too
+    -   Add [geom\_]{style="font-family: 'Courier New'"} (geometries) layers to visualize the data
+    -   Add design elements: labels, colors, fonts, legends, etc.
+
+## Plotting basics: length vs. weight 📉
+
+```{r, fig.dim=c(4,4)}
+ggplot(data = fhc_dat_merged) +
+  geom_point(aes(x = log_length, y = log_weight), color = 'blue')
+```
+
+## Plotting basics: length vs. weight 📉
+
+```{r,  fig.dim=c(4,4)}
+ggplot(data = fhc_dat_merged, aes(x = log_length, y = log_weight) ) +
+  geom_point(size = 2, color = 'blue', alpha = 0.5) +
+  labs(title="", x="Length (mm)", y="Weight (g)") +
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 14)) +
+  theme_bw()
+```
+
+## Plotting basics: length vs. weight 📉
+
+-   Plot object aesthetics, e.g., color by a factor (must be in aes)
+
+```{r,  fig.dim=c(7,4)}
+ggplot(data = fhc_dat_merged, aes(x = log_length, y = log_weight, color = site_name) ) +
+  geom_point(size = 2, alpha = 0.5) +
+  labs(title="", x="Length (mm)", y="Weight (g)", color='Site') +
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 14)) +
+  theme_bw()
+```
+
+## Facets
+
+-   Multiple panel figures
+
+```{r, echo=TRUE, eval=FALSE, fig.dim=c(8,3.5)}
+ggplot(data = fhc_dat_merged, aes(x = log_length, y = log_weight) ) +
+  facet_wrap(~ site_name) + # Make panels by site name
+  geom_point(size = 2, color = 'blue', alpha = 0.5) +
+  labs(title="", x="Length (mm)", y="Weight (g)") +
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 14)) +
+  theme_bw() + 
+  theme(strip.background =element_rect(fill="white"))
+```
+
+## Facets
+
+```{r, echo=FALSE, eval=TRUE, fig.dim=c(8,3.5)}
+ggplot(data = fhc_dat_merged, aes(x = log_length, y = log_weight) ) +
+  facet_wrap(~ site_name) + # Make panels by site name
+  geom_point(size = 2, color = 'blue', alpha = 0.5) +
+  labs(title="", x="Length (mm)", y="Weight (g)") +
+  theme(axis.text = element_text(size = 13),
+        axis.title = element_text(size = 14)) +
+  theme_bw() + 
+  theme(strip.background =element_rect(fill="white"))
+```
+
+## Saving figures
+
+[ggsave()]{style="font-family: 'Courier New'"}: path, image type, dimensions, resolution
+
+```{r, echo=TRUE, eval=FALSE}
+ggsave('../03_figures/Fig_name.pdf', height=6, width=8, units = "in")
+
+ggsave('../03_figures/Fig_name.png', height=4, width=8, units="in")
+
+```
+
+## Figure (geom) types
+
+-   Points: [geom_point()]{style="font-family: 'Courier New'"}
+
+-   Box plots: [geom_boxplot()]{style="font-family: 'Courier New'"}
+
+-   Histograms: [geom_histogram()]{style="font-family: 'Courier New'"}
+
+-   Bar charts: [geom_bar()]{style="font-family: 'Courier New'"}
+
+-   Line graphs: [geom_line()]{style="font-family: 'Courier New'"} or [geom_path()]{style="font-family: 'Courier New'"}
+
+**Google** for millions of examples
+
+## Geospatial analysis and mapping 🗺️
+
+[sf]{style="font-family: 'Courier New'"} (simple features) package
+
+A good online book resource for an introduction to spatial analysis is [Spatial Data Science](https://r-spatial.org/book/)
+
+::: incremental
+-   Why [sf]{style="font-family: 'Courier New'"}?
+
+    -   [sf]{style="font-family: 'Courier New'"} can be treated as data frames in most operations (they are both [sf]{style="font-family: 'Courier New'"} and data frame objects)
+
+    -   [sf]{style="font-family: 'Courier New'"} can be combined with pipes (`%>%`)
+
+    -   can plot using [ggplot()]{style="font-family: 'Courier New'"}: enhanced plotting
+
+    -   It is faster than other spatial packages (reading/writing data)
+:::
+
+## Basic mapping
+
+-   Prepare some data
+
+```{r}
+# Grab state boundaries from spData and
+# transform the coordinate references system (crs)
+# crs = 4326 = WGS84; WGS84 CRS is often used for lat and long positions
+us_states2 <- st_transform(us_states, crs = 4326)
+# Rename column
+colnames(us_states2)[2] <- "State"
+# Select state(s) of interest
+selectStates <- c("Pennsylvania")
+# Subset data for plotting
+us_state_select <- us_states2[us_states2$State %in% selectStates, ]
+
+```
+
+## Plot using [ggplot()]{style="font-family: 'Courier New'"}
+
+```{r}
+ggplot() + 
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80")
+```
+
+## Make a little prettier
+
+```{r}
+ggplot() + 
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+```
+
+## Add our sample locations
+
+```{r, echo=T, eval=FALSE}
+# Create spatial sf object (4326 = WGS84)
+map.dat <- st_as_sf(site_dat, coords = c("long", "lat"), crs = 4326)
+# Add points to plot
+ggplot() + 
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=map.dat, shape=16, size = 2, colour="black") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+```
+
+## Add our sample locations
+
+```{r, echo=FALSE, eval=TRUE}
+# Create spatial sf object (4326 = WGS84)
+map.dat <- st_as_sf(site_dat, coords = c("long", "lat"), crs = 4326)
+# Add points to plot
+ggplot() + 
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=map.dat, shape=16, size = 2, colour="black") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+```
+
+## Lets add a bit more to this map...
+
+-   Plot points conditionally using [filter()]{style="font-family: 'Courier New'"}
+
+```{r, echo=TRUE, eval=FALSE}
+
+ggplot() + 
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=filter(map.dat, site_name=='Bainbridge' | site_name=='Union'), shape=16,    size = 3, colour="red") +
+  geom_sf(data=filter(map.dat, site_name=='Clemson Island' | site_name=='East Donegal Township' |site_name=='Shady Nook'), shape='x',    size = 5, colour="green") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+```
+
+## Lets add a bit more to this map...
+
+```{r, echo=FALSE, eval=TRUE}
+
+ggplot() + 
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=filter(map.dat, site_name=='Bainbridge' | site_name=='Union'), shape=16,    size = 3, colour="blue") +
+  geom_sf(data=filter(map.dat, site_name=='Clemson Island' | site_name=='East Donegal Township' |site_name=='Shady Nook'), shape='x',    size = 5, colour="darkgreen") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+```
+
+## And a bit more...NHD flowlines
+
+```{r, eval=TRUE}
+library(nhdplusTools)
+# USGS 01578310 SUSQUEHANNA RIVER AT CONOWINGO, MD
+# plot_nhdplus("01578310")
+# first identify the gage of interest
+nldi_nwis <- list(featureSource = "nwissite", featureID = "USGS-01578310")
+# next download the basin:
+basin <- get_nldi_basin(nldi_feature = nldi_nwis)
+# find out comid of the gage or point:
+(comid_pt <- discover_nhdplus_id(nldi_feature = nldi_nwis))
+
+```
+
+## And a bit more...NHD flowlines
+
+```{r, eval=TRUE}
+# ----- Get Streamline Data
+# We also can specify whether we want upstream or downstream mainstem or tributaries.
+# UT= “Upstream Tributaries”, UM=“Upstream Mainstem”, DM=“Downstream Main”,
+# or DD=“Downstream Diversions”. We can also specify a distance we want to
+# travel from that initial starting point. The default is 10km.
+# pull mainstems from a USGS gage
+us_main <- navigate_nldi(nldi_feature = nldi_nwis,
+                         mode="UM",
+                         distance_km =  800)$UM %>%
+  st_geometry() 
+# Pull upstream tributaries
+us_tribs <- navigate_nldi(nldi_feature = nldi_nwis,
+                          mode="UT",
+                          distance_km =  800)$UT %>%
+  st_geometry()
+```
+
+## Plot
+
+```{r, eval=FALSE, echo=TRUE}
+ggplot() +
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=basin) +
+  geom_sf(data=us_tribs, col="lightblue", alpha=0.2) +
+  geom_sf(data=us_main, col = 'black') +
+  geom_sf(data=filter(map.dat, site_name=='Bainbridge' | site_name=='Union'),
+          shape=16,    size = 3, colour="red") +
+  geom_sf(data=filter(map.dat, site_name=='Clemson Island' | site_name=='East Donegal Township' |site_name=='Shady Nook'),
+          shape='x',    size = 5, colour="green") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+```
+
+## Map
+
+```{r, eval=TRUE, echo=FALSE}
+ggplot() +
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=basin) +
+  geom_sf(data=us_tribs, col="lightblue", alpha=0.2) +
+  geom_sf(data=us_main, col = 'black') +
+  geom_sf(data=filter(map.dat, site_name=='Bainbridge' | site_name=='Union'),
+          shape=16,    size = 3, colour="red") +
+  geom_sf(data=filter(map.dat, site_name=='Clemson Island' | site_name=='East Donegal Township' |site_name=='Shady Nook'),
+          shape='x',    size = 5, colour="green") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+```
+
+## Add West branch
+
+```{r}
+# ----------- Grab West Branch
+# 01553500
+nldi_nwis_WB <- list(featureSource = "nwissite", featureID = "USGS-01553500")
+# find out comid of the gage or point:
+(comid_pt_WB <- discover_nhdplus_id(nldi_feature = nldi_nwis_WB))
+# Upstream
+us_main_WB <- navigate_nldi(nldi_feature = nldi_nwis_WB,
+                         mode="UM",
+                         distance_km =  1500)$UM %>%
+  st_geometry()
+# Downstream
+ds_main_WB <- navigate_nldi(nldi_feature = nldi_nwis_WB,
+                            mode="DM",
+                            distance_km =  80)$DM %>%
+  st_geometry()
+
+```
+
+## Plot
+
+```{r, eval=FALSE}
+ggplot() +
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=basin) +
+  geom_sf(data=us_tribs, col="lightblue", alpha=0.2) +
+  geom_sf(data=us_main, col = 'black') +
+  geom_sf(data=us_main_WB, col = 'black') +
+  geom_sf(data=ds_main_WB, col = 'black') +
+  geom_sf(data=filter(map.dat, site_name=='Bainbridge' | site_name=='Union'),
+          shape=16,    size = 3, colour="red") +
+  geom_sf(data=filter(map.dat, site_name=='Clemson Island' | site_name=='East Donegal Township' |site_name=='Shady Nook'),
+          shape='x',    size = 5, colour="green") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+
+```
+
+## Map
+
+```{r, echo=FALSE, eval=TRUE}
+ggplot() +
+  geom_sf(data = us_state_select, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=basin) +
+  geom_sf(data=us_tribs, col="lightblue", alpha=0.2) +
+  geom_sf(data=us_main, col = 'black') +
+  geom_sf(data=us_main_WB, col = 'black') +
+  geom_sf(data=ds_main_WB, col = 'black') +
+  geom_sf(data=filter(map.dat, site_name=='Bainbridge' | site_name=='Union'),
+          shape=16,    size = 3, colour="red") +
+  geom_sf(data=filter(map.dat, site_name=='Clemson Island' | site_name=='East Donegal Township' |site_name=='Shady Nook'),
+          shape='x',    size = 5, colour="green") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+
+```
+
+## A "final" map
+
+```{r, echo=FALSE, eval=TRUE}
+selectStates2 <- c("Pennsylvania", "New York")
+# Subset data for plotting
+us_state_select2 <- us_states2[us_states2$State %in% selectStates2, ]
+
+cities <- data.frame(city = c("Pittsburgh", "Harrisburg", "Philadephia"),
+                     lat = c(40.440624, 40.263680, 39.952583),
+                     long = c(-79.995888, -76.890739, -75.165222),
+                     plat = c(40.440624, 40.263680, 39.952583),
+                     plong = c(-79.995888, -76.890739, -75.165222))
+citites.dat <- st_as_sf(cities, coords = c("long", "lat"), crs = 4326)
+
+p1 <- ggplot() +
+  geom_sf(data = us_state_select2, color = "gray30", lwd=1, fill="grey80") +
+  geom_sf(data=basin) +
+  geom_sf(data=us_tribs, col="lightblue", alpha=0.2) +
+  geom_sf(data=us_main, col = 'darkblue') +
+  geom_sf(data=us_main_WB, col = 'darkblue') +
+  geom_sf(data=ds_main_WB, col = 'darkblue') +
+  geom_sf(data=citites.dat, shape = 17, col = "olivedrab4") +
+  geom_text(data = citites.dat, aes(x = plong, y = plat, label = city),
+            size = 3.9, col = "black", fontface = "bold", nudge_x = 0.86) +
+  geom_sf(data=filter(map.dat, site_name=='Bainbridge' | site_name=='Union'),
+          shape=16,    size = 3, colour="red") +
+  geom_sf(data=filter(map.dat, site_name=='Clemson Island' | site_name=='East Donegal Township' |site_name=='Shady Nook'),
+          shape='x',    size = 5, colour="orange") +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 11),
+        axis.title = element_text(size = 12))
+
+
+
+# Inset map
+# Box for study area
+bb1 <- st_as_sfc(st_bbox(us_state_select2))
+
+ggm1 = ggplot() +
+  geom_sf(data = us_states2, fill = "white") +
+  geom_sf(data = bb1, fill = NA, color = "red", size = 1.2) +
+  theme_void()
+
+
+# Create final inset map
+library(cowplot)
+ggdraw() +
+  draw_plot(p1) +
+  draw_plot(ggm1, x = 0.27, y = 0.66, width = 0.25, height = 0.25)
+
+```
+
+## ggmap R package
+
+-   Use map services from Google Map, Stamen maps, etc. in R
+
+-   Requires some initial configuration - e.g., obtaining an API Key from Google Cloud
+
+## Google Maps
+
+```{r, eval=TRUE, echo=FALSE}
+#| layout-ncol: 3
+#| column: page
+#| fig-width: 6
+#| fig-height: 6
+get_map(location = c(lon = -77.85807816278827, lat = 40.80762950782668),
+               maptype = "satellite", zoom=14) %>%
+  ggmap()
+
+get_map(location = c(lon = -77.85807816278827, lat = 40.80762950782668),
+               maptype = "roadmap", zoom=14) %>%
+  ggmap()
+
+get_map(location = c(lon = -77.85807816278827, lat = 40.80762950782668),
+               maptype = "terrain", zoom=14) %>%
+  ggmap()
+```
+
+
+
+## Make a study map
+```{r, eval=TRUE, echo=FALSE, fig.align = 'center'}
+# Grab bounding box coordinates for use in get_map
+# Get bounding box for Susq. Riv Basin
+bb_basin <- st_as_sfc(st_bbox(basin))
+
+
+xvalues <- st_coordinates(bb_basin)[c(1,2),1] # min & max of x values
+yvalues <- st_coordinates(bb_basin)[c(2,3),2] # min & max of y values
+
+boundingbox <- c(left = xvalues[1], bottom = yvalues[1], right = xvalues[2], top = yvalues[2]-1)
+
+m1 <- get_map(boundingbox,
+        maptype = "terrain", zoom=8, source = "google") %>%
+  ggmap() +
+  geom_sf(data = map.dat,size = 3,colour="red",
+          show.legend = "point",
+          inherit.aes = FALSE) +
+  geom_sf(data=us_main, col = 'darkblue',
+          inherit.aes = FALSE) +
+  geom_sf(data=us_main_WB, col = 'darkblue',
+          inherit.aes = FALSE) +
+  geom_sf(data=ds_main_WB, col = 'darkblue',
+          inherit.aes = FALSE) +
+  labs(title="", y="Latitude", x="Longitude") +
+  theme_bw() +
+  #set the CRS for the entire map (sometimes needed)
+  coord_sf(crs = st_crs(4326))
+
+m1
+
+```
+
+
+
+## RStudio setup
+
+```{r, eval=FALSE}
+library(ggmap)
+register_google(key = "xxxxxxx", write = TRUE)
+
+get_map(location = c(lon = -77.85807816278827, lat = 40.80762950782668),
+               maptype = "satellite", zoom=4) %>%
+  ggmap()
+```

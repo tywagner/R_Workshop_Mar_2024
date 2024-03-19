@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="Intro_to_R_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Intro_to_R_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Intro_to_R_files/libs/quarto-html/popper.min.js"></script>
+<script src="Intro_to_R_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Intro_to_R_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Intro_to_R_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Intro_to_R_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="Intro_to_R_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.3.450">
+
+  <meta name="author" content="Ty Wagner">
+  <meta name="dcterms.date" content="2024-01-15">
+  <title>Introduction to R</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="Intro_to_R_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Intro_to_R_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="Intro_to_R_files/libs/revealjs/dist/theme/quarto.css">
+  <link href="Intro_to_R_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Intro_to_R_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Intro_to_R_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Intro_to_R_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-titled.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-titled) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-titled.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-titled .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-titled .callout-title  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-titled.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-titled.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-title {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-title {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-title {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-titled .callout-body > .callout-content > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-titled .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-titled) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-title {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-title {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-title {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-title {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-title {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Introduction to R</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Ty Wagner 
+</div>
+        <p class="quarto-title-affiliation">
+            PACFWRU, Penn State University
+          </p>
+    </div>
+</div>
+
+  <p class="date">2024-01-15</p>
+</section>
+<section id="an-introduction-to" class="slide level2">
+<h2>An Introduction to</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="Rlogo.png" width="400" height="400"></p>
+</figure>
+</div>
+</section>
+<section id="what-is-r" class="slide level2">
+<h2>What is R?</h2>
+<ul>
+<li><p>R is an environment for statistical computing and graphics</p></li>
+<li><p>Widely used in scientific and quantitative research</p></li>
+<li><p>Freely available and has extensive functionality</p></li>
+<li><p>Background on R and documentation can be found on the R Project website <a href="https://www.r-project.org/" class="uri">https://www.r-project.org/</a></p></li>
+</ul>
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell" style="flex-basis: 29.4%;justify-content: center;">
+<p><img data-src="Fig1_pga.png" width="250"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 35.3%;justify-content: center;">
+<p><img data-src="Fig2_maps.png" width="300"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 35.3%;justify-content: center;">
+<p><img data-src="Fig3_map.png" width="300"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="rstudio-ide" class="slide level2">
+<h2>RStudio IDE</h2>
+<ul>
+<li><p>An integrated development environment (IDE) for R</p></li>
+<li><p><a href="https://posit.co/products/open-source/rstudio/" class="uri">https://posit.co/products/open-source/rstudio/</a></p></li>
+<li><p>Allows you to organize your work into projects, create documents, presentations, webpages, etc. (this presentation was made using RStudio)</p></li>
+<li><p>You will want to download and install the latest versions of R and RStudio</p></li>
+</ul>
+</section>
+<section id="other-resources" class="slide level2">
+<h2>Other resources</h2>
+<ul>
+<li><p><em>Google</em></p></li>
+<li><p><em>R-bloggers</em>: a blog aggregator of content contributed by bloggers who write about R; <a href="https://www.r-bloggers.com/" class="uri">https://www.r-bloggers.com/</a></p></li>
+<li><p><em>Stackoverflow</em>: a public platform for asking questions and finding answers related to R; <a href="https://stackoverflow.com/questions/tagged/r" class="uri">https://stackoverflow.com/questions/tagged/r</a></p></li>
+</ul>
+</section>
+<section id="r-packages" class="slide level2">
+<h2>R packages 📦</h2>
+<ul>
+<li><p>The <em>base</em> installation of R includes many functions and commands</p></li>
+<li><p>However, you will need to access additional functionality encoded into <strong>packages</strong> contributed by the R developer community</p></li>
+</ul>
+</section>
+<section id="r-packages-1" class="slide level2">
+<h2>R packages 📦</h2>
+<ul>
+<li>Can download directly from within RStudio</li>
+<li>Contain help files and often include data and examples</li>
+<li>Downloaded from CRAN (Comprehensive R Archive Network)</li>
+</ul>
+
+<img data-src="ggplot.png" class="r-stretch"></section>
+<section id="r-packages-2" class="slide level2">
+<h2>R packages 📦</h2>
+<p>Can also download from the R console</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Install the R package ggplot2</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">install.packages</span>(<span class="st">"ggplot2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Some packages are only available to download from <a href="https://github.com">GitHub</a> - a large platform for programmers to store and share code. Install instructions will often be provided on the GitHub landing page, but will often be something like:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Install the 'devtools' package first</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Then install the package from GitHub</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"ddauber/package_name"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="some-useful-r-packages-to-get-started-with" class="slide level2">
+<h2>Some useful R packages to get started with:</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">library</span>(dplyr) <span class="co"># data management</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">library</span>(tidyverse) <span class="co"># data workflow</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="fu">library</span>(ggplot2) <span class="co"># plotting: both figures and maps</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="fu">library</span>(lubridate) <span class="co"># working with dates</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="fu">library</span>(bslib) <span class="co"># a modern UI toolkit for Shiny and R Markdown </span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="fu">library</span>(stringr) <span class="co"># manipulate character stings</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="fu">library</span>(sf) <span class="co"># map creation, works with ggplot</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="fu">library</span>(spData) <span class="co"># spatial data</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="fu">library</span>(car)  <span class="co"># logit function</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="using-r-packages" class="slide level2">
+<h2>Using R packages</h2>
+<ul>
+<li>You only need to download R packages once, but you need to ‘load’ them in each R session that you work on</li>
+</ul>
+<p>To load R packages you simply use the <em>library</em> function with the name of the R package in parentheses:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>It is good practice to load all your R packages at the very beginning of your R script</p>
+</section>
+<section id="unlocking-the-power-of-r" class="slide level2">
+<h2>Unlocking the power of R 🔐</h2>
+<ul>
+<li>Basic computation</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Perform basic arithmetic operations</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="dv">2</span> <span class="sc">+</span> <span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="dv">5</span> <span class="sc">-</span> <span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="dv">6</span> <span class="sc">*</span> <span class="dv">6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 36</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="dv">50</span><span class="sc">/</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 25</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="dv">10</span><span class="sc">^</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 100</code></pre>
+</div>
+</div>
+</section>
+<section id="executing-simple-base-functions" class="slide level2">
+<h2>Executing simple <em>base</em> functions</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Square root</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">sqrt</span>(<span class="dv">45</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6.708204</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Logarithms (natural log)</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="fu">log</span>(<span class="fl">4.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.504077</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># Base 10</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="fu">log10</span>(<span class="fl">4.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6532125</code></pre>
+</div>
+</div>
+</section>
+<section id="the-assignment-operator--" class="slide level2">
+<h2>The Assignment Operator: <strong>&lt;-</strong></h2>
+<ul>
+<li>Assigns values to an object (data class)</li>
+</ul>
+<div>
+<ul>
+<li class="fragment"><p>An object can be:</p>
+<ul>
+<li class="fragment"><p>Numerical value</p></li>
+<li class="fragment"><p>Data set (data frame)</p></li>
+<li class="fragment"><p>Vector, matrix, array</p></li>
+<li class="fragment"><p>Function</p></li>
+<li class="fragment"><p>Model output</p></li>
+<li class="fragment"><p>List</p></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="the-assignment-operator---1" class="slide level2">
+<h2>The Assignment Operator: <strong>&lt;-</strong></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># Assign the value of 5 to object named x</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a>x <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a></span>
+<span id="cb21-4"><a href="#cb21-4"></a><span class="co"># Assign the value of 2 times x to the object y</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a>y <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note that R is case sensitive: y ⧣ Y</p>
+<p>Created objects can be used in other operations and to define new objects</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>my_answer <span class="ot">&lt;-</span> x <span class="sc">*</span> y</span>
+<span id="cb22-2"><a href="#cb22-2"></a>my_answer</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 50</code></pre>
+</div>
+</div>
+<p>These new objects can be used in functions</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="fu">log</span>(my_answer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3.912023</code></pre>
+</div>
+</div>
+</section>
+<section id="r-object-types-data-classes" class="slide level2">
+<h2>R object types (data classes)</h2>
+<p>Vectors and Arrays</p>
+<div>
+<ul>
+<li class="fragment"><p><strong>Vector</strong>: a one-dimensional array, all elements of a vector must be of the same type (numerical or character)</p></li>
+<li class="fragment"><p><strong>Matrix</strong>: a two-dimensional array with rows and columns (numeric or character)</p></li>
+<li class="fragment"><p><strong>Array</strong>: as a matrix, but of arbitrary dimension</p></li>
+</ul>
+</div>
+</section>
+<section id="vectors-and-arrays" class="slide level2">
+<h2>Vectors and Arrays</h2>
+<p>We can apply operations and functions to each element of an R object, such as a vector</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># Create a vector of fish lengths</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>fish_lengths <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">115</span>, <span class="dv">226</span>, <span class="dv">305</span>, <span class="dv">95</span>, <span class="dv">445</span>)</span>
+<span id="cb26-3"><a href="#cb26-3"></a>fish_lengths</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 115 226 305  95 445</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="co"># Take natural log of fish lengths</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a>log_fish_lengths <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">log</span>(fish_lengths), <span class="dv">2</span>)</span>
+<span id="cb28-3"><a href="#cb28-3"></a>log_fish_lengths</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.74 5.42 5.72 4.55 6.10</code></pre>
+</div>
+</div>
+<p>We can also apply functions or operations to the entire vector</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="co"># Calculate mean length</span></span>
+<span id="cb30-2"><a href="#cb30-2"></a>mean_fish_lengths <span class="ot">&lt;-</span> <span class="fu">mean</span>(fish_lengths)</span>
+<span id="cb30-3"><a href="#cb30-3"></a>mean_fish_lengths</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 237.2</code></pre>
+</div>
+</div>
+</section>
+<section id="vectors-and-arrays-1" class="slide level2">
+<h2>Vectors and Arrays</h2>
+<p>We can easily subset vectors and arrays using subscripts <code>[]</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="co"># Create a vector of fish lengths</span></span>
+<span id="cb32-2"><a href="#cb32-2"></a>fish_lengths <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">115</span>, <span class="dv">226</span>, <span class="dv">305</span>, <span class="dv">95</span>, <span class="dv">445</span>)</span>
+<span id="cb32-3"><a href="#cb32-3"></a>fish_lengths</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 115 226 305  95 445</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="co"># Grab first 3 lengths</span></span>
+<span id="cb34-2"><a href="#cb34-2"></a>subset1 <span class="ot">&lt;-</span> fish_lengths[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb34-3"><a href="#cb34-3"></a>subset1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 115 226 305</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a><span class="co"># Grab 1st, 3rd, and last length</span></span>
+<span id="cb36-2"><a href="#cb36-2"></a>subset2 <span class="ot">&lt;-</span> fish_lengths[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>)]</span>
+<span id="cb36-3"><a href="#cb36-3"></a>subset2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 115 305 445</code></pre>
+</div>
+</div>
+</section>
+<section id="vectors-and-arrays-2" class="slide level2">
+<h2>Vectors and Arrays</h2>
+<p>Let’s do the same for a 2-D array (a matrix)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a><span class="co"># Create a matrix of random numbers</span></span>
+<span id="cb38-2"><a href="#cb38-2"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>) <span class="co"># set a seed so we get the same random numbers each time we run this</span></span>
+<span id="cb38-3"><a href="#cb38-3"></a>mymatrix <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">15</span>), <span class="at">nrow =</span> <span class="dv">5</span>, <span class="at">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb38-4"><a href="#cb38-4"></a>mymatrix</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           [,1]       [,2]        [,3]
+[1,] -1.2070657  0.5060559 -0.47719270
+[2,]  0.2774292 -0.5747400 -0.99838644
+[3,]  1.0844412 -0.5466319 -0.77625389
+[4,] -2.3456977 -0.5644520  0.06445882
+[5,]  0.4291247 -0.8900378  0.95949406</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a><span class="co"># Subset the first column</span></span>
+<span id="cb40-2"><a href="#cb40-2"></a>s1 <span class="ot">&lt;-</span> mymatrix[,<span class="dv">1</span>]</span>
+<span id="cb40-3"><a href="#cb40-3"></a>s1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -1.2070657  0.2774292  1.0844412 -2.3456977  0.4291247</code></pre>
+</div>
+</div>
+</section>
+<section id="vectors-and-arrays-3" class="slide level2">
+<h2>Vectors and Arrays</h2>
+<p>Let’s do the same for a 2-D array (a matrix)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a><span class="co"># Subset the first and last column</span></span>
+<span id="cb42-2"><a href="#cb42-2"></a>s2 <span class="ot">&lt;-</span> mymatrix[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)]</span>
+<span id="cb42-3"><a href="#cb42-3"></a>s2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           [,1]        [,2]
+[1,] -1.2070657 -0.47719270
+[2,]  0.2774292 -0.99838644
+[3,]  1.0844412 -0.77625389
+[4,] -2.3456977  0.06445882
+[5,]  0.4291247  0.95949406</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a><span class="co"># Subset first row</span></span>
+<span id="cb44-2"><a href="#cb44-2"></a>s3 <span class="ot">&lt;-</span> mymatrix[<span class="dv">1</span>,]</span>
+<span id="cb44-3"><a href="#cb44-3"></a>s3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -1.2070657  0.5060559 -0.4771927</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a><span class="co"># Subset first 2 rows and first and last column</span></span>
+<span id="cb46-2"><a href="#cb46-2"></a>s4 <span class="ot">&lt;-</span> mymatrix[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)]</span>
+<span id="cb46-3"><a href="#cb46-3"></a>s4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           [,1]       [,2]
+[1,] -1.2070657 -0.4771927
+[2,]  0.2774292 -0.9983864</code></pre>
+</div>
+</div>
+</section>
+<section id="vectors-and-arrays-4" class="slide level2">
+<h2>Vectors and Arrays</h2>
+<p>We can do the same for character values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a>lake_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Round lake"</span>, <span class="st">"Sparkle Lake"</span>, <span class="st">"Deep Lake"</span>, <span class="st">"Mud Lake"</span>)</span>
+<span id="cb48-2"><a href="#cb48-2"></a>s5 <span class="ot">&lt;-</span> lake_names[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)]</span>
+<span id="cb48-3"><a href="#cb48-3"></a>s5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Round lake" "Deep Lake" </code></pre>
+</div>
+</div>
+<p>We can use logical values in subsetting too</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a><span class="co"># Create logical vector indicating if a lake is invaded with zebra mussels</span></span>
+<span id="cb50-2"><a href="#cb50-2"></a>invaded <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)</span>
+<span id="cb50-3"><a href="#cb50-3"></a>lake_names[invaded]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Sparkle Lake" "Deep Lake"   </code></pre>
+</div>
+</div>
+</section>
+<section id="r-object-types" class="slide level2">
+<h2>R object types</h2>
+<p><strong>Data frames</strong></p>
+<ul>
+<li><p>2-D array like structure (rows and columns)</p></li>
+<li><p>Similar to a spreadsheet of data</p></li>
+<li><p>Can be a mix of variable types (some columns numeric and some character or date, etc.)</p></li>
+<li><p>The fundamental data structure by most of R’s modeling functions</p></li>
+<li><p>Typically we read data from a .txt or .csv file into a data frame object for analysis, plotting, etc.</p></li>
+</ul>
+</section>
+<section id="r-object-types-1" class="slide level2">
+<h2>R object types</h2>
+<p><strong>List</strong>: R objects which contain elements of different types, including vectors, arrays, data frames, etc.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>mylist <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"Brook trout"</span>,<span class="st">"Smallmouth bass"</span>,<span class="st">"Flathead catfish"</span>), <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">10</span>), <span class="at">nrow =</span> <span class="dv">5</span>, <span class="at">ncol=</span><span class="dv">2</span>),</span>
+<span id="cb52-2"><a href="#cb52-2"></a>               <span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2023-01-31"</span>), <span class="fu">as.Date</span>(<span class="st">"2021-05-21"</span>)))</span>
+<span id="cb52-3"><a href="#cb52-3"></a></span>
+<span id="cb52-4"><a href="#cb52-4"></a>mylist</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+[1] "Brook trout"      "Smallmouth bass"  "Flathead catfish"
+
+[[2]]
+           [,1]       [,2]
+[1,] -0.1102855  0.1340882
+[2,] -0.5110095 -0.4906859
+[3,] -0.9111954 -0.4405479
+[4,] -0.8371717  0.4595894
+[5,]  2.4158352 -0.6937202
+
+[[3]]
+[1] "2023-01-31" "2021-05-21"</code></pre>
+</div>
+</div>
+</section>
+<section id="getting-started-creating-r-projects" class="slide level2">
+<h2>Getting started: creating R Projects</h2>
+<ul>
+<li><p>R projects are a useful way to organize your R projects</p>
+<ul>
+<li><p>All files (R scripts, data, functions, etc.) are located in a single project folder</p></li>
+<li><p>Facilitates Open Science and sharing of code</p></li>
+<li><p>Facilitates interacting with <a href="https://github.com">GitHub</a> (for version control and collaboration)</p></li>
+<li><p>Allows for the creation of other products: presentations, documents, books, etc.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="creating-r-projects" class="slide level2">
+<h2>Creating R projects</h2>
+<ul>
+<li>Create a project by: <code>File</code> ➡️ <code>New Project...</code></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="p1.png" width="400" height="400"></p>
+</figure>
+</div>
+</section>
+<section id="creating-r-projects-1" class="slide level2">
+<h2>Creating R projects</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="p2.png" width="450" height="450"></p>
+</figure>
+</div>
+</section>
+<section id="creating-r-projects-2" class="slide level2">
+<h2>Creating R projects</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="p3.png" width="450" height="450"></p>
+</figure>
+</div>
+</section>
+<section id="creating-r-projects-3" class="slide level2">
+<h2>Creating R projects</h2>
+<ul>
+<li>Also useful to do the following: <code>Tools</code> ➡️ <code>Global Options...</code> uncheck these boxes</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="g1.png" width="450" height="450"></p>
+</figure>
+</div>
+</section>
+<section id="r-projects" class="slide level2">
+<h2>R projects</h2>
+<ul>
+<li><p>Organize your R projects with relevant directories 📂</p>
+<ul>
+<li><p>scripts</p></li>
+<li><p>data</p></li>
+<li><p>figures</p></li>
+<li><p>model_output</p></li>
+<li><p>etc.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="r-projects---organize" class="slide level2">
+<h2>R projects - organize</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="d1.png" width="600" height="500"></p>
+</figure>
+</div>
+</section>
+<section id="r-scripts" class="slide level2">
+<h2>R scripts</h2>
+<ul>
+<li>You will forget why you did what you did and/or what you did…and it’s frustrating!</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="farley1.gif" width="400" height="400"></p>
+</figure>
+</div>
+</section>
+<section id="r-scripts-1" class="slide level2">
+<h2>R scripts</h2>
+<ul>
+<li><p>Organization and comments are important</p></li>
+<li><p>Comments are added after hash mark <code>#</code></p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a><span class="co"># This is an example of a comment in R. R will not execute this code</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Load packages at the top of the script</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1"></a><span class="co"># Here I am loading packages</span></span>
+<span id="cb55-2"><a href="#cb55-2"></a><span class="co"># These comments are overkill, but you get the point</span></span>
+<span id="cb55-3"><a href="#cb55-3"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb55-4"><a href="#cb55-4"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="create-r-scripts" class="slide level2">
+<h2>Create R scripts</h2>
+<ul>
+<li><p><code>File</code> ➡️ <code>New File</code> ➡️ <code>R Script</code></p></li>
+<li><p>Save file with descriptive name in the appropriate project directory</p></li>
+</ul>
+<div>
+<ul>
+<li class="fragment"><strong>You are now ready to start using R!</strong></li>
+</ul>
+</div>
+</section>
+<section id="importing-data" class="slide level2">
+<h2>Importing data</h2>
+<ul>
+<li><p>There are several functions that can be used to import data</p>
+<ul>
+<li><p>Data: spreadsheets (flat tables), spatial data (shapefiles, rasters)</p></li>
+<li><p>Can be many different formats: <code>.txt</code>, <code>.csv</code>, <code>.rds</code>, <code>feather</code>, etc.</p></li>
+</ul></li>
+<li><p>Typically, we read in data as <code>.csv</code> files</p></li>
+<li><p>A useful function for reading in <code>.csv</code> files is <span style="font-family: 'Courier New'">tidyverse::read_csv</span></p></li>
+</ul>
+</section>
+<section id="import-example-data" class="slide level2">
+<h2>Import example data 🐟</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a>fhc_dat <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'../02_data/FHC_length_weigtht.csv'</span>)</span>
+<span id="cb56-2"><a href="#cb56-2"></a><span class="fu">str</span>(fhc_dat) <span class="co"># display structure of R object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spc_tbl_ [38 × 7] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+ $ Date                 : chr [1:38] "7/12/22" "7/14/22" "7/14/22" "7/14/22" ...
+ $ Fish ID              : chr [1:38] "sus-235" "sus-236" "sus-237" "sus-238" ...
+ $ Site                 : chr [1:38] "Clemson Island" "Clemson Island" "Clemson Island" "Clemson Island" ...
+ $ Length (mm)          : num [1:38] 820 645 925 618 630 665 772 661 385 387 ...
+ $ Weight (kg)          : num [1:38] NA 3.31 8.67 2.78 2.82 3.26 6.17 3.24 NA NA ...
+ $ Fin Clip ( Y or N )  : chr [1:38] "Y" "Y" "Y" "Y" ...
+ $ Liver/Muscle (Y or N): chr [1:38] "Y" "Y" "Y" "Y" ...
+ - attr(*, "spec")=
+  .. cols(
+  ..   Date = col_character(),
+  ..   `Fish ID` = col_character(),
+  ..   Site = col_character(),
+  ..   `Length (mm)` = col_double(),
+  ..   `Weight (kg)` = col_double(),
+  ..   `Fin Clip ( Y or N )` = col_character(),
+  ..   `Liver/Muscle (Y or N)` = col_character()
+  .. )
+ - attr(*, "problems")=&lt;externalptr&gt; </code></pre>
+</div>
+</div>
+</section>
+<section id="pipe-operator-in-r-or" class="slide level2">
+<h2>Pipe operator in R <code>%&gt;%</code> or <code>|&gt;</code></h2>
+<ul>
+<li><p><code>%&gt;%</code> is a pipe operator provided by the magrittr <span style="font-family: 'Courier New'">magrittr</span> package</p></li>
+<li><p><code>|&gt;</code> is a simple native forward pipe syntax</p></li>
+<li><p>Differences between these can be found <a href="https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/">here</a> and <a href="https://www.r-bloggers.com/2021/05/the-new-r-pipe/">here</a></p>
+<ul>
+<li>A few differences are: using <code>|&gt;</code> uses one less package, <code>|&gt;</code> might be faster computationally, to most of us the differences are negligible and the choice is yours</li>
+</ul></li>
+<li><p>We will use <code>%&gt;%</code></p></li>
+</ul>
+</section>
+<section id="pipes" class="slide level2">
+<h2>Pipes</h2>
+<ul>
+<li>We always need to perform data manipulations after importing data into R</li>
+</ul>
+<div>
+<ul>
+<li class="fragment"><p>Data manipulations require several steps</p>
+<ul>
+<li class="fragment"><p>Subset data</p>
+<ul>
+<li class="fragment">Select/remove certain observations, rows, columns</li>
+</ul></li>
+<li class="fragment"><p>Change a data type (e.g., numeric, character, factor, etc.)</p></li>
+<li class="fragment"><p>Transform data (e.g., log-transform)</p></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="pipe-operator-in-r" class="slide level2">
+<h2>Pipe operator in R <code>%&gt;%</code></h2>
+<ul>
+<li><p>You can do these steps one at a time, but we can more efficiently “chain” these steps together - where the intermediate result from one function is passed into the next function</p></li>
+<li><p>Pipes help increase the readability of your code</p></li>
+<li><p>Easily add steps anywhere along the chain sequence</p></li>
+</ul>
+</section>
+<section id="pipe-operator-in-r-1" class="slide level2">
+<h2>Pipe operator in R <code>%&gt;%</code></h2>
+<ul>
+<li>Pipe basics</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a>x <span class="ot">&lt;-</span> <span class="fl">10.6592</span></span>
+<span id="cb58-2"><a href="#cb58-2"></a><span class="co"># log function; f(x)</span></span>
+<span id="cb58-3"><a href="#cb58-3"></a><span class="fu">log</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.366423</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a><span class="co"># Use a pipe, so that f(x) is written as x %&gt;%  f</span></span>
+<span id="cb60-2"><a href="#cb60-2"></a>x <span class="sc">%&gt;%</span> <span class="fu">log</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.366423</code></pre>
+</div>
+</div>
+<p>The <span style="font-family: 'Courier New'">log</span> function takes a single argument (in this case, x), but we can see how pipes are used for functions that take more than one argument</p>
+</section>
+<section id="pipe-operator-in-r-2" class="slide level2">
+<h2>Pipe operator in R <code>%&gt;%</code></h2>
+<ul>
+<li>The <span style="font-family: 'Courier New'">round</span> function takes two arguments: <span style="font-family: 'Courier New'">round(x, digits=0)</span></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1"></a><span class="fu">round</span>(x, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10.659</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1"></a><span class="co"># Use a pipe</span></span>
+<span id="cb64-2"><a href="#cb64-2"></a></span>
+<span id="cb64-3"><a href="#cb64-3"></a>x <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10.659</code></pre>
+</div>
+</div>
+</section>
+<section id="back-to-our-data" class="slide level2">
+<h2>Back to our data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1"></a><span class="fu">head</span>(fhc_dat, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 7
+  Date    `Fish ID` Site       `Length (mm)` `Weight (kg)` `Fin Clip ( Y or N )`
+  &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;              &lt;dbl&gt;         &lt;dbl&gt; &lt;chr&gt;                
+1 7/12/22 sus-235   Clemson I…           820         NA    Y                    
+2 7/14/22 sus-236   Clemson I…           645          3.31 Y                    
+3 7/14/22 sus-237   Clemson I…           925          8.67 Y                    
+# ℹ 1 more variable: `Liver/Muscle (Y or N)` &lt;chr&gt;</code></pre>
+</div>
+</div>
+<ul>
+<li><p>Let’s clean this data set up</p>
+<ul>
+<li><p>Rename some columns</p></li>
+<li><p>Change some data types (Date, factors)</p></li>
+</ul></li>
+<li><p>We could do this one at a time, but let’s chain these steps together using pipes</p></li>
+</ul>
+</section>
+<section id="data-cleaning---rename" class="slide level2">
+<h2>Data cleaning - rename</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1"></a><span class="co"># First, change column names that have spaces</span></span>
+<span id="cb68-2"><a href="#cb68-2"></a>fhc_dat1 <span class="ot">&lt;-</span>  fhc_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb68-3"><a href="#cb68-3"></a>  <span class="fu">rename</span>(<span class="st">"fish_id"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Fish ID</span><span class="st">`</span>,</span>
+<span id="cb68-4"><a href="#cb68-4"></a>         <span class="st">"length_mm"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Length (mm)</span><span class="st">`</span>,</span>
+<span id="cb68-5"><a href="#cb68-5"></a>         <span class="st">"weight_g"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Weight (kg)</span><span class="st">`</span>,</span>
+<span id="cb68-6"><a href="#cb68-6"></a>         <span class="st">"fin_clip"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Fin Clip ( Y or N )</span><span class="st">`</span>,</span>
+<span id="cb68-7"><a href="#cb68-7"></a>         <span class="st">"liver_muscle"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Liver/Muscle (Y or N)</span><span class="st">`</span>)</span>
+<span id="cb68-8"><a href="#cb68-8"></a><span class="fu">head</span>(fhc_dat1, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 7
+  Date    fish_id Site           length_mm weight_g fin_clip liver_muscle
+  &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;       
+1 7/12/22 sus-235 Clemson Island       820    NA    Y        Y           
+2 7/14/22 sus-236 Clemson Island       645     3.31 Y        Y           
+3 7/14/22 sus-237 Clemson Island       925     8.67 Y        Y           </code></pre>
+</div>
+</div>
+</section>
+<section id="data-cleaning---change-data-types" class="slide level2">
+<h2>Data cleaning - change data types</h2>
+<ul>
+<li>Let’s add to the previously written chain of commands - just add another pipe!</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1"></a>fhc_dat2 <span class="ot">&lt;-</span>  fhc_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb70-2"><a href="#cb70-2"></a>  <span class="fu">rename</span>(<span class="st">"fish_id"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Fish ID</span><span class="st">`</span>,</span>
+<span id="cb70-3"><a href="#cb70-3"></a>         <span class="st">"length_mm"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Length (mm)</span><span class="st">`</span>,</span>
+<span id="cb70-4"><a href="#cb70-4"></a>         <span class="st">"weight_g"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Weight (kg)</span><span class="st">`</span>,</span>
+<span id="cb70-5"><a href="#cb70-5"></a>         <span class="st">"fin_clip"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Fin Clip ( Y or N )</span><span class="st">`</span>,</span>
+<span id="cb70-6"><a href="#cb70-6"></a>         <span class="st">"liver_muscle"</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Liver/Muscle (Y or N)</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb70-7"><a href="#cb70-7"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">mdy</span>(Date), <span class="co"># mdy is from the lubridate package</span></span>
+<span id="cb70-8"><a href="#cb70-8"></a>         <span class="at">fish_id =</span> <span class="fu">factor</span>(fish_id),</span>
+<span id="cb70-9"><a href="#cb70-9"></a>         <span class="at">Site =</span> <span class="fu">factor</span>(Site),</span>
+<span id="cb70-10"><a href="#cb70-10"></a>         <span class="at">log_length =</span> <span class="fu">log</span>(length_mm),</span>
+<span id="cb70-11"><a href="#cb70-11"></a>         <span class="at">log_weight =</span> <span class="fu">log</span>(weight_g))</span>
+<span id="cb70-12"><a href="#cb70-12"></a><span class="fu">head</span>(fhc_dat2, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 9
+  Date       fish_id Site    length_mm weight_g fin_clip liver_muscle log_length
+  &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;             &lt;dbl&gt;
+1 2022-07-12 sus-235 Clemso…       820    NA    Y        Y                  6.71
+2 2022-07-14 sus-236 Clemso…       645     3.31 Y        Y                  6.47
+3 2022-07-14 sus-237 Clemso…       925     8.67 Y        Y                  6.83
+# ℹ 1 more variable: log_weight &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="commonly-used-data-manipulation-functions" class="slide level2">
+<h2>Commonly used data manipulation functions</h2>
+<ul>
+<li><p><span style="font-family: 'Courier New'">rename()</span>: rename columns</p></li>
+<li><p><span style="font-family: 'Courier New'">mutate()</span>: create/modify new variables</p></li>
+<li><p><span style="font-family: 'Courier New'">filter()</span>: keep observations (rows) based on criteria</p></li>
+<li><p><span style="font-family: 'Courier New'">select()</span>: select specific columns (variables)</p></li>
+<li><p><span style="font-family: 'Courier New'">arrange()</span>: sort data by one or more variables</p></li>
+</ul>
+</section>
+<section id="commonly-used-data-manipulation-functions-1" class="slide level2">
+<h2>Commonly used data manipulation functions</h2>
+<ul>
+<li><p><span style="font-family: 'Courier New'">group_by()</span>: aggregate data</p></li>
+<li><p><span style="font-family: 'Courier New'">summarise()</span>: summarize data</p></li>
+<li><p><span style="font-family: 'Courier New'">ifelse()</span>: create a variable based on condition</p></li>
+<li><p><span style="font-family: 'Courier New'">left_join()</span>: add columns from y to x, <span style="font-family: 'Courier New'">left_join()</span> will keep all observations in x</p></li>
+</ul>
+</section>
+<section id="lets-read-in-our-2nd-flathead-catfish-data-set" class="slide level2">
+<h2>Let’s read in our 2nd flathead catfish data set</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1"></a>site_dat <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'../02_data/FHC_site_info.csv'</span>)</span>
+<span id="cb72-2"><a href="#cb72-2"></a><span class="fu">str</span>(site_dat) <span class="co"># display structure of R object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spc_tbl_ [6 × 6] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+ $ site_number      : num [1:6] 1 2 3 4 5 6
+ $ site_name        : chr [1:6] "Clemson Island" "Shady Nook" "Northumberland" "Bainbridge" ...
+ $ lat              : num [1:6] 40.5 40.8 40.9 40.1 41.2 ...
+ $ long             : num [1:6] -76.9 -76.8 -76.8 -76.7 -76.1 ...
+ $ sampling week    : chr [1:6] "7/11/22" "7/18/22" "7/25/22" "8/1/22" ...
+ $ samples collected: chr [1:6] "stable isotopes, PFAS, fin clips" "stable isotopes, PFAS, fin clips" "stable isotopes, PFAS" "stable isotopes, PFAS, fin clips" ...
+ - attr(*, "spec")=
+  .. cols(
+  ..   site_number = col_double(),
+  ..   site_name = col_character(),
+  ..   lat = col_double(),
+  ..   long = col_double(),
+  ..   `sampling week` = col_character(),
+  ..   `samples collected` = col_character()
+  .. )
+ - attr(*, "problems")=&lt;externalptr&gt; </code></pre>
+</div>
+</div>
+</section>
+<section id="site-data-clean-up" class="slide level2">
+<h2>Site data clean-up</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1"></a><span class="co"># We just want the site name and lat/longs for mapping</span></span>
+<span id="cb74-2"><a href="#cb74-2"></a>site_dat <span class="ot">&lt;-</span> site_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb74-3"><a href="#cb74-3"></a>  <span class="fu">select</span>(site_name, lat, long) <span class="sc">%&gt;%</span> </span>
+<span id="cb74-4"><a href="#cb74-4"></a>  <span class="fu">mutate</span>(<span class="at">site_name =</span> <span class="fu">factor</span>(site_name)) </span>
+<span id="cb74-5"><a href="#cb74-5"></a><span class="fu">head</span>(site_dat, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  site_name        lat  long
+  &lt;fct&gt;          &lt;dbl&gt; &lt;dbl&gt;
+1 Clemson Island  40.5 -76.9
+2 Shady Nook      40.8 -76.8
+3 Northumberland  40.9 -76.8</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1"></a><span class="co"># Look at unique values of site_name</span></span>
+<span id="cb76-2"><a href="#cb76-2"></a><span class="fu">levels</span>(site_dat<span class="sc">$</span>site_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Bainbridge"            "Clemson Island"        "East Donegal Township"
+[4] "Northumberland"        "Shady Nook"            "Union"                </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1"></a><span class="co"># Site names in our fish data set</span></span>
+<span id="cb78-2"><a href="#cb78-2"></a><span class="fu">levels</span>(fhc_dat2<span class="sc">$</span>Site)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Bainbridge"     "Clemson Island" "East Donegal"   "Shady Nook"    
+[5] "Union"         </code></pre>
+</div>
+</div>
+</section>
+<section id="prepare-to-merge-and-merge-data-sets" class="slide level2">
+<h2>Prepare to merge and merge data sets</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1"></a>fhc_dat_merged <span class="ot">&lt;-</span> fhc_dat2 <span class="sc">%&gt;%</span> </span>
+<span id="cb80-2"><a href="#cb80-2"></a>  <span class="fu">rename</span>(<span class="st">"site_name"</span> <span class="ot">=</span> Site) <span class="sc">%&gt;%</span> <span class="co"># rename so they match in each data set</span></span>
+<span id="cb80-3"><a href="#cb80-3"></a>  <span class="fu">select</span>(<span class="sc">-</span>fin_clip, <span class="sc">-</span>liver_muscle) <span class="sc">%&gt;%</span> <span class="co"># remove unwanted columns</span></span>
+<span id="cb80-4"><a href="#cb80-4"></a>  <span class="fu">mutate</span>(<span class="at">site_name =</span> <span class="fu">recode_factor</span>(site_name, <span class="st">"East Donegal"</span><span class="ot">=</span><span class="st">"East Donegal Township"</span>)) <span class="sc">%&gt;%</span> <span class="co"># change factor level name</span></span>
+<span id="cb80-5"><a href="#cb80-5"></a>  <span class="fu">left_join</span>(site_dat, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"site_name"</span>)) <span class="co"># merge</span></span>
+<span id="cb80-6"><a href="#cb80-6"></a><span class="fu">head</span>(fhc_dat_merged)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  Date       fish_id site_name    length_mm weight_g log_length log_weight   lat
+  &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;            &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;
+1 2022-07-12 sus-235 Clemson Isl…       820    NA          6.71      NA     40.5
+2 2022-07-14 sus-236 Clemson Isl…       645     3.31       6.47       1.20  40.5
+3 2022-07-14 sus-237 Clemson Isl…       925     8.67       6.83       2.16  40.5
+4 2022-07-14 sus-238 Clemson Isl…       618     2.78       6.43       1.02  40.5
+5 2022-07-14 sus-239 Clemson Isl…       630     2.82       6.45       1.04  40.5
+6 2022-07-14 sus-240 Clemson Isl…       665     3.26       6.50       1.18  40.5
+# ℹ 1 more variable: long &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1"></a><span class="fu">dim</span>(fhc_dat_merged)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 38  9</code></pre>
+</div>
+</div>
+</section>
+<section id="plotting-basics" class="slide level2">
+<h2>Plotting basics 📉</h2>
+<p><span style="font-family: 'Courier New'">ggplot2</span> package</p>
+<ul>
+<li><p><span style="font-family: 'Courier New'">ggplot2</span> is based on <strong>adding</strong> plot “layers” using the <code>+</code> symbol</p></li>
+<li><p>Basic syntax for a ggplot object will often look like this:</p>
+<ul>
+<li>Beging with <span style="font-family: 'Courier New'">ggplot2</span> command
+<ul>
+<li>This ‘opens’ ggplot and allows for adding layers using <code>+</code></li>
+<li>The data set to use is often specified here too</li>
+</ul></li>
+<li>Add <span style="font-family: 'Courier New'">geom_</span> (geometries) layers to visualize the data</li>
+<li>Add design elements: labels, colors, fonts, legends, etc.</li>
+</ul></li>
+</ul>
+</section>
+<section id="plotting-basics-length-vs.-weight" class="slide level2">
+<h2>Plotting basics: length vs.&nbsp;weight 📉</h2>
+<div class="cell" data-fig.dim="[4,4]">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> fhc_dat_merged) <span class="sc">+</span></span>
+<span id="cb84-2"><a href="#cb84-2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> log_length, <span class="at">y =</span> log_weight), <span class="at">color =</span> <span class="st">'blue'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-29-1.png" width="384" class="r-stretch"></section>
+<section id="plotting-basics-length-vs.-weight-1" class="slide level2">
+<h2>Plotting basics: length vs.&nbsp;weight 📉</h2>
+<div class="cell" data-fig.dim="[4,4]">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> fhc_dat_merged, <span class="fu">aes</span>(<span class="at">x =</span> log_length, <span class="at">y =</span> log_weight) ) <span class="sc">+</span></span>
+<span id="cb85-2"><a href="#cb85-2"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">'blue'</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb85-3"><a href="#cb85-3"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">""</span>, <span class="at">x=</span><span class="st">"Length (mm)"</span>, <span class="at">y=</span><span class="st">"Weight (g)"</span>) <span class="sc">+</span></span>
+<span id="cb85-4"><a href="#cb85-4"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>),</span>
+<span id="cb85-5"><a href="#cb85-5"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>)) <span class="sc">+</span></span>
+<span id="cb85-6"><a href="#cb85-6"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-30-1.png" width="384" class="r-stretch"></section>
+<section id="plotting-basics-length-vs.-weight-2" class="slide level2">
+<h2>Plotting basics: length vs.&nbsp;weight 📉</h2>
+<ul>
+<li>Plot object aesthetics, e.g., color by a factor (must be in aes)</li>
+</ul>
+<div class="cell" data-fig.dim="[7,4]">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> fhc_dat_merged, <span class="fu">aes</span>(<span class="at">x =</span> log_length, <span class="at">y =</span> log_weight, <span class="at">color =</span> site_name) ) <span class="sc">+</span></span>
+<span id="cb86-2"><a href="#cb86-2"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb86-3"><a href="#cb86-3"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">""</span>, <span class="at">x=</span><span class="st">"Length (mm)"</span>, <span class="at">y=</span><span class="st">"Weight (g)"</span>, <span class="at">color=</span><span class="st">'Site'</span>) <span class="sc">+</span></span>
+<span id="cb86-4"><a href="#cb86-4"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>),</span>
+<span id="cb86-5"><a href="#cb86-5"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>)) <span class="sc">+</span></span>
+<span id="cb86-6"><a href="#cb86-6"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-31-1.png" width="672" class="r-stretch"></section>
+<section id="facets" class="slide level2">
+<h2>Facets</h2>
+<ul>
+<li>Multiple panel figures</li>
+</ul>
+<div class="cell" data-fig.dim="[8,3.5]">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> fhc_dat_merged, <span class="fu">aes</span>(<span class="at">x =</span> log_length, <span class="at">y =</span> log_weight) ) <span class="sc">+</span></span>
+<span id="cb87-2"><a href="#cb87-2"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site_name) <span class="sc">+</span> <span class="co"># Make panels by site name</span></span>
+<span id="cb87-3"><a href="#cb87-3"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">'blue'</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb87-4"><a href="#cb87-4"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">""</span>, <span class="at">x=</span><span class="st">"Length (mm)"</span>, <span class="at">y=</span><span class="st">"Weight (g)"</span>) <span class="sc">+</span></span>
+<span id="cb87-5"><a href="#cb87-5"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>),</span>
+<span id="cb87-6"><a href="#cb87-6"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>)) <span class="sc">+</span></span>
+<span id="cb87-7"><a href="#cb87-7"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb87-8"><a href="#cb87-8"></a>  <span class="fu">theme</span>(<span class="at">strip.background =</span><span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"white"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="facets-1" class="slide level2">
+<h2>Facets</h2>
+
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-33-1.png" width="768" class="r-stretch"></section>
+<section id="saving-figures" class="slide level2">
+<h2>Saving figures</h2>
+<p><span style="font-family: 'Courier New'">ggsave()</span>: path, image type, dimensions, resolution</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1"></a><span class="fu">ggsave</span>(<span class="st">'../03_figures/Fig_name.pdf'</span>, <span class="at">height=</span><span class="dv">6</span>, <span class="at">width=</span><span class="dv">8</span>, <span class="at">units =</span> <span class="st">"in"</span>)</span>
+<span id="cb88-2"><a href="#cb88-2"></a></span>
+<span id="cb88-3"><a href="#cb88-3"></a><span class="fu">ggsave</span>(<span class="st">'../03_figures/Fig_name.png'</span>, <span class="at">height=</span><span class="dv">4</span>, <span class="at">width=</span><span class="dv">8</span>, <span class="at">units=</span><span class="st">"in"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="figure-geom-types" class="slide level2">
+<h2>Figure (geom) types</h2>
+<ul>
+<li><p>Points: <span style="font-family: 'Courier New'">geom_point()</span></p></li>
+<li><p>Box plots: <span style="font-family: 'Courier New'">geom_boxplot()</span></p></li>
+<li><p>Histograms: <span style="font-family: 'Courier New'">geom_histogram()</span></p></li>
+<li><p>Bar charts: <span style="font-family: 'Courier New'">geom_bar()</span></p></li>
+<li><p>Line graphs: <span style="font-family: 'Courier New'">geom_line()</span> or <span style="font-family: 'Courier New'">geom_path()</span></p></li>
+</ul>
+<p><strong>Google</strong> for millions of examples</p>
+</section>
+<section id="geospatial-analysis-and-mapping" class="slide level2">
+<h2>Geospatial analysis and mapping 🗺️</h2>
+<p><span style="font-family: 'Courier New'">sf</span> (simple features) package</p>
+<p>A good online book resource for an introduction to spatial analysis is <a href="https://r-spatial.org/book/">Spatial Data Science</a></p>
+<div>
+<ul>
+<li class="fragment"><p>Why <span style="font-family: 'Courier New'">sf</span>?</p>
+<ul>
+<li class="fragment"><p><span style="font-family: 'Courier New'">sf</span> can be treated as data frames in most operations (they are both <span style="font-family: 'Courier New'">sf</span> and data frame objects)</p></li>
+<li class="fragment"><p><span style="font-family: 'Courier New'">sf</span> can be combined with pipes (<code>%&gt;%</code>)</p></li>
+<li class="fragment"><p>can plot using <span style="font-family: 'Courier New'">ggplot()</span>: enhanced plotting</p></li>
+<li class="fragment"><p>It is faster than other spatial packages (reading/writing data)</p></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="basic-mapping" class="slide level2">
+<h2>Basic mapping</h2>
+<ul>
+<li>Prepare some data</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1"></a><span class="co"># Grab state boundaries from spData and</span></span>
+<span id="cb89-2"><a href="#cb89-2"></a><span class="co"># transform the coordinate references system (crs)</span></span>
+<span id="cb89-3"><a href="#cb89-3"></a><span class="co"># crs = 4326 = WGS84; WGS84 CRS is often used for lat and long positions</span></span>
+<span id="cb89-4"><a href="#cb89-4"></a>us_states2 <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(us_states, <span class="at">crs =</span> <span class="dv">4326</span>)</span>
+<span id="cb89-5"><a href="#cb89-5"></a><span class="co"># Rename column</span></span>
+<span id="cb89-6"><a href="#cb89-6"></a><span class="fu">colnames</span>(us_states2)[<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="st">"State"</span></span>
+<span id="cb89-7"><a href="#cb89-7"></a><span class="co"># Select state(s) of interest</span></span>
+<span id="cb89-8"><a href="#cb89-8"></a>selectStates <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Pennsylvania"</span>)</span>
+<span id="cb89-9"><a href="#cb89-9"></a><span class="co"># Subset data for plotting</span></span>
+<span id="cb89-10"><a href="#cb89-10"></a>us_state_select <span class="ot">&lt;-</span> us_states2[us_states2<span class="sc">$</span>State <span class="sc">%in%</span> selectStates, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="plot-using-ggplot" class="slide level2">
+<h2>Plot using <span style="font-family: 'Courier New'">ggplot()</span></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb90-2"><a href="#cb90-2"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_state_select, <span class="at">color =</span> <span class="st">"gray30"</span>, <span class="at">lwd=</span><span class="dv">1</span>, <span class="at">fill=</span><span class="st">"grey80"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-36-1.png" width="960" class="r-stretch"></section>
+<section id="make-a-little-prettier" class="slide level2">
+<h2>Make a little prettier</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb91-2"><a href="#cb91-2"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_state_select, <span class="at">color =</span> <span class="st">"gray30"</span>, <span class="at">lwd=</span><span class="dv">1</span>, <span class="at">fill=</span><span class="st">"grey80"</span>) <span class="sc">+</span></span>
+<span id="cb91-3"><a href="#cb91-3"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">""</span>, <span class="at">y=</span><span class="st">"Latitude"</span>, <span class="at">x=</span><span class="st">"Longitude"</span>) <span class="sc">+</span></span>
+<span id="cb91-4"><a href="#cb91-4"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb91-5"><a href="#cb91-5"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb91-6"><a href="#cb91-6"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-37-1.png" width="960" class="r-stretch"></section>
+<section id="add-our-sample-locations" class="slide level2">
+<h2>Add our sample locations</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1"></a><span class="co"># Create spatial sf object (4326 = WGS84)</span></span>
+<span id="cb92-2"><a href="#cb92-2"></a>map.dat <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(site_dat, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"long"</span>, <span class="st">"lat"</span>), <span class="at">crs =</span> <span class="dv">4326</span>)</span>
+<span id="cb92-3"><a href="#cb92-3"></a><span class="co"># Add points to plot</span></span>
+<span id="cb92-4"><a href="#cb92-4"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb92-5"><a href="#cb92-5"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_state_select, <span class="at">color =</span> <span class="st">"gray30"</span>, <span class="at">lwd=</span><span class="dv">1</span>, <span class="at">fill=</span><span class="st">"grey80"</span>) <span class="sc">+</span></span>
+<span id="cb92-6"><a href="#cb92-6"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span>map.dat, <span class="at">shape=</span><span class="dv">16</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">colour=</span><span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb92-7"><a href="#cb92-7"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">""</span>, <span class="at">y=</span><span class="st">"Latitude"</span>, <span class="at">x=</span><span class="st">"Longitude"</span>) <span class="sc">+</span></span>
+<span id="cb92-8"><a href="#cb92-8"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb92-9"><a href="#cb92-9"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb92-10"><a href="#cb92-10"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="add-our-sample-locations-1" class="slide level2">
+<h2>Add our sample locations</h2>
+
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-39-1.png" width="960" class="r-stretch"></section>
+<section id="lets-add-a-bit-more-to-this-map" class="slide level2">
+<h2>Lets add a bit more to this map…</h2>
+<ul>
+<li>Plot points conditionally using <span style="font-family: 'Courier New'">filter()</span></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb93-2"><a href="#cb93-2"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_state_select, <span class="at">color =</span> <span class="st">"gray30"</span>, <span class="at">lwd=</span><span class="dv">1</span>, <span class="at">fill=</span><span class="st">"grey80"</span>) <span class="sc">+</span></span>
+<span id="cb93-3"><a href="#cb93-3"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span><span class="fu">filter</span>(map.dat, site_name<span class="sc">==</span><span class="st">'Bainbridge'</span> <span class="sc">|</span> site_name<span class="sc">==</span><span class="st">'Union'</span>), <span class="at">shape=</span><span class="dv">16</span>,    <span class="at">size =</span> <span class="dv">3</span>, <span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb93-4"><a href="#cb93-4"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span><span class="fu">filter</span>(map.dat, site_name<span class="sc">==</span><span class="st">'Clemson Island'</span> <span class="sc">|</span> site_name<span class="sc">==</span><span class="st">'East Donegal Township'</span> <span class="sc">|</span>site_name<span class="sc">==</span><span class="st">'Shady Nook'</span>), <span class="at">shape=</span><span class="st">'x'</span>,    <span class="at">size =</span> <span class="dv">5</span>, <span class="at">colour=</span><span class="st">"green"</span>) <span class="sc">+</span></span>
+<span id="cb93-5"><a href="#cb93-5"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">""</span>, <span class="at">y=</span><span class="st">"Latitude"</span>, <span class="at">x=</span><span class="st">"Longitude"</span>) <span class="sc">+</span></span>
+<span id="cb93-6"><a href="#cb93-6"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb93-7"><a href="#cb93-7"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb93-8"><a href="#cb93-8"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="lets-add-a-bit-more-to-this-map-1" class="slide level2">
+<h2>Lets add a bit more to this map…</h2>
+
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-41-1.png" width="960" class="r-stretch"></section>
+<section id="and-a-bit-morenhd-flowlines" class="slide level2">
+<h2>And a bit more…NHD flowlines</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1"></a><span class="fu">library</span>(nhdplusTools)</span>
+<span id="cb94-2"><a href="#cb94-2"></a><span class="co"># USGS 01578310 SUSQUEHANNA RIVER AT CONOWINGO, MD</span></span>
+<span id="cb94-3"><a href="#cb94-3"></a><span class="co"># plot_nhdplus("01578310")</span></span>
+<span id="cb94-4"><a href="#cb94-4"></a><span class="co"># first identify the gage of interest</span></span>
+<span id="cb94-5"><a href="#cb94-5"></a>nldi_nwis <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">featureSource =</span> <span class="st">"nwissite"</span>, <span class="at">featureID =</span> <span class="st">"USGS-01578310"</span>)</span>
+<span id="cb94-6"><a href="#cb94-6"></a><span class="co"># next download the basin:</span></span>
+<span id="cb94-7"><a href="#cb94-7"></a>basin <span class="ot">&lt;-</span> <span class="fu">get_nldi_basin</span>(<span class="at">nldi_feature =</span> nldi_nwis)</span>
+<span id="cb94-8"><a href="#cb94-8"></a><span class="co"># find out comid of the gage or point:</span></span>
+<span id="cb94-9"><a href="#cb94-9"></a>(comid_pt <span class="ot">&lt;-</span> <span class="fu">discover_nhdplus_id</span>(<span class="at">nldi_feature =</span> nldi_nwis))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4726593</code></pre>
+</div>
+</div>
+</section>
+<section id="and-a-bit-morenhd-flowlines-1" class="slide level2">
+<h2>And a bit more…NHD flowlines</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1"></a><span class="co"># ----- Get Streamline Data</span></span>
+<span id="cb96-2"><a href="#cb96-2"></a><span class="co"># We also can specify whether we want upstream or downstream mainstem or tributaries.</span></span>
+<span id="cb96-3"><a href="#cb96-3"></a><span class="co"># UT= “Upstream Tributaries”, UM=“Upstream Mainstem”, DM=“Downstream Main”,</span></span>
+<span id="cb96-4"><a href="#cb96-4"></a><span class="co"># or DD=“Downstream Diversions”. We can also specify a distance we want to</span></span>
+<span id="cb96-5"><a href="#cb96-5"></a><span class="co"># travel from that initial starting point. The default is 10km.</span></span>
+<span id="cb96-6"><a href="#cb96-6"></a><span class="co"># pull mainstems from a USGS gage</span></span>
+<span id="cb96-7"><a href="#cb96-7"></a>us_main <span class="ot">&lt;-</span> <span class="fu">navigate_nldi</span>(<span class="at">nldi_feature =</span> nldi_nwis,</span>
+<span id="cb96-8"><a href="#cb96-8"></a>                         <span class="at">mode=</span><span class="st">"UM"</span>,</span>
+<span id="cb96-9"><a href="#cb96-9"></a>                         <span class="at">distance_km =</span>  <span class="dv">800</span>)<span class="sc">$</span>UM <span class="sc">%&gt;%</span></span>
+<span id="cb96-10"><a href="#cb96-10"></a>  <span class="fu">st_geometry</span>() </span>
+<span id="cb96-11"><a href="#cb96-11"></a><span class="co"># Pull upstream tributaries</span></span>
+<span id="cb96-12"><a href="#cb96-12"></a>us_tribs <span class="ot">&lt;-</span> <span class="fu">navigate_nldi</span>(<span class="at">nldi_feature =</span> nldi_nwis,</span>
+<span id="cb96-13"><a href="#cb96-13"></a>                          <span class="at">mode=</span><span class="st">"UT"</span>,</span>
+<span id="cb96-14"><a href="#cb96-14"></a>                          <span class="at">distance_km =</span>  <span class="dv">800</span>)<span class="sc">$</span>UT <span class="sc">%&gt;%</span></span>
+<span id="cb96-15"><a href="#cb96-15"></a>  <span class="fu">st_geometry</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="plot" class="slide level2">
+<h2>Plot</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb97-2"><a href="#cb97-2"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_state_select, <span class="at">color =</span> <span class="st">"gray30"</span>, <span class="at">lwd=</span><span class="dv">1</span>, <span class="at">fill=</span><span class="st">"grey80"</span>) <span class="sc">+</span></span>
+<span id="cb97-3"><a href="#cb97-3"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span>basin) <span class="sc">+</span></span>
+<span id="cb97-4"><a href="#cb97-4"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span>us_tribs, <span class="at">col=</span><span class="st">"lightblue"</span>, <span class="at">alpha=</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb97-5"><a href="#cb97-5"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span>us_main, <span class="at">col =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
+<span id="cb97-6"><a href="#cb97-6"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span><span class="fu">filter</span>(map.dat, site_name<span class="sc">==</span><span class="st">'Bainbridge'</span> <span class="sc">|</span> site_name<span class="sc">==</span><span class="st">'Union'</span>),</span>
+<span id="cb97-7"><a href="#cb97-7"></a>          <span class="at">shape=</span><span class="dv">16</span>,    <span class="at">size =</span> <span class="dv">3</span>, <span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb97-8"><a href="#cb97-8"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span><span class="fu">filter</span>(map.dat, site_name<span class="sc">==</span><span class="st">'Clemson Island'</span> <span class="sc">|</span> site_name<span class="sc">==</span><span class="st">'East Donegal Township'</span> <span class="sc">|</span>site_name<span class="sc">==</span><span class="st">'Shady Nook'</span>),</span>
+<span id="cb97-9"><a href="#cb97-9"></a>          <span class="at">shape=</span><span class="st">'x'</span>,    <span class="at">size =</span> <span class="dv">5</span>, <span class="at">colour=</span><span class="st">"green"</span>) <span class="sc">+</span></span>
+<span id="cb97-10"><a href="#cb97-10"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">""</span>, <span class="at">y=</span><span class="st">"Latitude"</span>, <span class="at">x=</span><span class="st">"Longitude"</span>) <span class="sc">+</span></span>
+<span id="cb97-11"><a href="#cb97-11"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb97-12"><a href="#cb97-12"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb97-13"><a href="#cb97-13"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="map" class="slide level2">
+<h2>Map</h2>
+
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-45-1.png" width="960" class="r-stretch"></section>
+<section id="add-west-branch" class="slide level2">
+<h2>Add West branch</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1"></a><span class="co"># ----------- Grab West Branch</span></span>
+<span id="cb98-2"><a href="#cb98-2"></a><span class="co"># 01553500</span></span>
+<span id="cb98-3"><a href="#cb98-3"></a>nldi_nwis_WB <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">featureSource =</span> <span class="st">"nwissite"</span>, <span class="at">featureID =</span> <span class="st">"USGS-01553500"</span>)</span>
+<span id="cb98-4"><a href="#cb98-4"></a><span class="co"># find out comid of the gage or point:</span></span>
+<span id="cb98-5"><a href="#cb98-5"></a>(comid_pt_WB <span class="ot">&lt;-</span> <span class="fu">discover_nhdplus_id</span>(<span class="at">nldi_feature =</span> nldi_nwis_WB))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8153799</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1"></a><span class="co"># Upstream</span></span>
+<span id="cb100-2"><a href="#cb100-2"></a>us_main_WB <span class="ot">&lt;-</span> <span class="fu">navigate_nldi</span>(<span class="at">nldi_feature =</span> nldi_nwis_WB,</span>
+<span id="cb100-3"><a href="#cb100-3"></a>                         <span class="at">mode=</span><span class="st">"UM"</span>,</span>
+<span id="cb100-4"><a href="#cb100-4"></a>                         <span class="at">distance_km =</span>  <span class="dv">1500</span>)<span class="sc">$</span>UM <span class="sc">%&gt;%</span></span>
+<span id="cb100-5"><a href="#cb100-5"></a>  <span class="fu">st_geometry</span>()</span>
+<span id="cb100-6"><a href="#cb100-6"></a><span class="co"># Downstream</span></span>
+<span id="cb100-7"><a href="#cb100-7"></a>ds_main_WB <span class="ot">&lt;-</span> <span class="fu">navigate_nldi</span>(<span class="at">nldi_feature =</span> nldi_nwis_WB,</span>
+<span id="cb100-8"><a href="#cb100-8"></a>                            <span class="at">mode=</span><span class="st">"DM"</span>,</span>
+<span id="cb100-9"><a href="#cb100-9"></a>                            <span class="at">distance_km =</span>  <span class="dv">80</span>)<span class="sc">$</span>DM <span class="sc">%&gt;%</span></span>
+<span id="cb100-10"><a href="#cb100-10"></a>  <span class="fu">st_geometry</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="plot-1" class="slide level2">
+<h2>Plot</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb101-2"><a href="#cb101-2"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> us_state_select, <span class="at">color =</span> <span class="st">"gray30"</span>, <span class="at">lwd=</span><span class="dv">1</span>, <span class="at">fill=</span><span class="st">"grey80"</span>) <span class="sc">+</span></span>
+<span id="cb101-3"><a href="#cb101-3"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span>basin) <span class="sc">+</span></span>
+<span id="cb101-4"><a href="#cb101-4"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span>us_tribs, <span class="at">col=</span><span class="st">"lightblue"</span>, <span class="at">alpha=</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb101-5"><a href="#cb101-5"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span>us_main, <span class="at">col =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
+<span id="cb101-6"><a href="#cb101-6"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span>us_main_WB, <span class="at">col =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
+<span id="cb101-7"><a href="#cb101-7"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span>ds_main_WB, <span class="at">col =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
+<span id="cb101-8"><a href="#cb101-8"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span><span class="fu">filter</span>(map.dat, site_name<span class="sc">==</span><span class="st">'Bainbridge'</span> <span class="sc">|</span> site_name<span class="sc">==</span><span class="st">'Union'</span>),</span>
+<span id="cb101-9"><a href="#cb101-9"></a>          <span class="at">shape=</span><span class="dv">16</span>,    <span class="at">size =</span> <span class="dv">3</span>, <span class="at">colour=</span><span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb101-10"><a href="#cb101-10"></a>  <span class="fu">geom_sf</span>(<span class="at">data=</span><span class="fu">filter</span>(map.dat, site_name<span class="sc">==</span><span class="st">'Clemson Island'</span> <span class="sc">|</span> site_name<span class="sc">==</span><span class="st">'East Donegal Township'</span> <span class="sc">|</span>site_name<span class="sc">==</span><span class="st">'Shady Nook'</span>),</span>
+<span id="cb101-11"><a href="#cb101-11"></a>          <span class="at">shape=</span><span class="st">'x'</span>,    <span class="at">size =</span> <span class="dv">5</span>, <span class="at">colour=</span><span class="st">"green"</span>) <span class="sc">+</span></span>
+<span id="cb101-12"><a href="#cb101-12"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">""</span>, <span class="at">y=</span><span class="st">"Latitude"</span>, <span class="at">x=</span><span class="st">"Longitude"</span>) <span class="sc">+</span></span>
+<span id="cb101-13"><a href="#cb101-13"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb101-14"><a href="#cb101-14"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb101-15"><a href="#cb101-15"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="map-1" class="slide level2">
+<h2>Map</h2>
+
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-48-1.png" width="960" class="r-stretch"></section>
+<section id="a-final-map" class="slide level2">
+<h2>A “final” map</h2>
+
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-49-1.png" width="960" class="r-stretch"></section>
+<section id="ggmap-r-package" class="slide level2">
+<h2>ggmap R package</h2>
+<ul>
+<li><p>Use map services from Google Map, Stamen maps, etc. in R</p></li>
+<li><p>Requires some initial configuration - e.g., obtaining an API Key from Google Cloud</p></li>
+</ul>
+</section>
+<section id="google-maps" class="slide level2">
+<h2>Google Maps</h2>
+<div class="cell column-page quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-50-1.png" width="576"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-50-2.png" width="576"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<p><img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-50-3.png" width="576"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="make-a-study-map" class="slide level2">
+<h2>Make a study map</h2>
+
+<img data-src="Intro_to_R_files/figure-revealjs/unnamed-chunk-51-1.png" width="960" class="r-stretch quarto-figure-center"></section>
+<section id="rstudio-setup" class="slide level2">
+<h2>RStudio setup</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1"></a><span class="fu">library</span>(ggmap)</span>
+<span id="cb102-2"><a href="#cb102-2"></a><span class="fu">register_google</span>(<span class="at">key =</span> <span class="st">"xxxxxxx"</span>, <span class="at">write =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb102-3"><a href="#cb102-3"></a></span>
+<span id="cb102-4"><a href="#cb102-4"></a><span class="fu">get_map</span>(<span class="at">location =</span> <span class="fu">c</span>(<span class="at">lon =</span> <span class="sc">-</span><span class="fl">77.85807816278827</span>, <span class="at">lat =</span> <span class="fl">40.80762950782668</span>),</span>
+<span id="cb102-5"><a href="#cb102-5"></a>               <span class="at">maptype =</span> <span class="st">"satellite"</span>, <span class="at">zoom=</span><span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb102-6"><a href="#cb102-6"></a>  <span class="fu">ggmap</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="footer footer-default">
+
+</div>
+</section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="Intro_to_R_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="Intro_to_R_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Intro_to_R_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Intro_to_R_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Intro_to_R_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Intro_to_R_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="Intro_to_R_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Intro_to_R_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Intro_to_R_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Intro_to_R_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'smaller': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        text: function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
