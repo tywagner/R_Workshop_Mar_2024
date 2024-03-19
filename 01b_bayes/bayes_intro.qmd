@@ -1,0 +1,561 @@
+---
+title: "A brief introduction to Bayesian statistics"
+format: 
+  revealjs:
+    slide-number: c/t
+---
+
+## Why Use Bayesian Statistics?
+
+::: {.incremental}
+-   Bayesian statistics can:
+
+    -   utilize prior knowledge,
+
+    -   handle small sample sizes,
+
+    -   handle complex models.
+
+-   Bayesian statistics offers a framework for more intuitive statistical inference.
+:::
+
+## Statistical Inference
+
+![](inference_diagram_1.png)
+
+## Statistical Inference
+
+![](inference_diagram_2.png)
+
+## Statistical Inference
+
+![](inference_diagram_3.png)
+
+## Statistical Inference
+
+![](inference_diagram_4.png)
+
+## Frequentist vs. Bayesian Inference
+
+![](baysian_vs_freq.png)
+
+## Frequentist Statistics
+::: {.incremental}
+-   Parameters are fixed but unknown.
+-   Probability is determined by frequencies from repeated trials.
+-   Significance is determined assuming the null hypothesis is true.
+-   Parameters are estimated as point estimates.
+:::
+
+## Bayesian Statistics
+::: {.incremental}
+-   Parameters follow probability distributions (priors).
+-   Probability is determined by prior beliefs and data.
+-   Inference is performed with the distribution of the parameter conditioned on the data (posterior).
+-   significance can be determines without assuming the null hypothesis is true.
+:::
+## Important Note {background-color="#02577b"}
+
+-   Frequentist hypothesis testing assumes the null hypothesis is true and ignores the alternative hypothesis.
+-   This can lead to p-fishing.
+
+## Posterior Distribution
+::: {.incremental}
+-   Bayesian inference is preformed with the **posterior distribution**, which can be found with Bayes' theorem
+
+```{=html}
+<span class="math display">\[
+\underbrace{\Pr(\text{parameters} | \text{data})}_{\text{posterior}} = \frac{\overbrace{\Pr(\text{data} | \text{parameters})}^{\text{likelihood}} \overbrace{\Pr(\text{parameters})}^{\text{prior}}}{\underbrace{\Pr(\text{data})}_{evidence}} .
+\]</span></p>
+```
+
+-   The posterior is influenced by both the data and our prior beliefs
+:::
+
+## Fair Coin Flip Example
+::: {.incremental}
+-   Experiment: flip a fair coin to determine probability of heads.
+
+    -   Let $$
+         Y =
+           \left\{\begin{array}{ll}
+           1, & \text{if heads} \\
+           0, & \text{if tails}, 
+        \end{array}\right.
+        $$
+
+    -   $Y \sim \text{Bernoulli}(\theta),$
+
+    -   $P(\text{head})=\theta$.
+:::
+
+## Fair Coin: Prior and Posterior
+::: {.incremental}
+-   Consider the non-informative prior $$
+    \theta\sim\text{Uniform}(0,1)
+    $$
+-   It can be proven this gives the posterior $$\theta|y_1,...,y_n \sim\text{Beta}\Big(1+\sum_{i=1}^ny_i, 1+n-\sum_{i=1}^ny_i\Big).$$
+:::
+
+## Fair Coin: Posterior Distribution
+Lets see how the posterior is effected by increasing the sample size ($n$)
+
+```{r, echo=FALSE, results='hide'}
+
+
+#4x4 plots
+par(mfrow=c(2,2))
+
+#-----------------------
+# plot 1: uniform prior
+#-----------------------
+curve(dunif(x,0,1),lwd=3,main='n=0 (prior)',cex.main=1.5,
+      ylab='Posterior Density',xlab='Theta',col=4)
+
+#---------------------------------
+# plot 2: n=2
+#---------------------------------
+y <- c(1,1)
+n <- length(y)
+curve(dbeta(x,1+sum(y),1+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+
+#---------------------------------
+# plot 3: n=10
+#---------------------------------
+y <- rbinom(10,size=1,p=0.5)
+n <- length(y)
+curve(dbeta(x,1+sum(y),1+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+
+#---------------------------------
+# plot 4: n=100
+#---------------------------------
+y <- rbinom(100,size=1,p=0.5)
+n <- length(y)
+curve(dbeta(x,1+sum(y),1+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+
+#reset to one plot
+par(mfrow=c(1,1))
+```
+
+## Important Note {background-color="#02577b"}
+
+-   Prior information generally becomes less influential on the posterior distribution as the sample size increases.
+
+## Fair Coin: Inference
+-   We can use the mean or median of our posterior as our parameter estimate for $\theta$.
+-   We can use posterior probability to check if our coin is fair $$
+    P(\theta>0.5|\text{the number of heads})
+    $$
+
+```{r, echo=FALSE, results='hide'}
+
+
+par(mfrow=c(1,1))
+y <- rbinom(100,size=1,p=0.5)
+n <- length(y)
+curve(dbeta(x,1+sum(y),1+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+```
+
+
+## Unfair Coin Example: Flat Prior
+-   Now assume $\theta_{\text{true}}=0.7$
+-   Lets consider the same non-informative prior $\theta\sim\text{Uniform}(0,1)$
+
+```{r, echo=FALSE, results='hide'}
+
+
+#4x4 plots
+par(mfrow=c(2,2))
+
+#-----------------------
+# plot 1: uniform prior
+#-----------------------
+curve(dunif(x,0,1),lwd=3,main='n=0 (prior)',cex.main=1.5,
+      ylab='Posterior Density',xlab='Theta',col=4)
+
+#---------------------------------
+# plot 2: n=2
+#---------------------------------
+y <- c(1,1)
+n <- length(y)
+curve(dbeta(x,1+sum(y),1+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+
+#---------------------------------
+# plot 3: n=10
+#---------------------------------
+y <- rbinom(10,size=1,p=0.5)
+n <- length(y)
+curve(dbeta(x,1+sum(y),1+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+
+#---------------------------------
+# plot 4: n=100
+#---------------------------------
+y <- rbinom(100,size=1,p=0.5)
+n <- length(y)
+curve(dbeta(x,1+sum(y),1+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+
+#reset to one plot
+par(mfrow=c(1,1))
+```
+
+## Unfair Coin: Informative Prior
+
+-   What if we consider the more informative prior $\theta\sim\text{Beta}(7,3)$
+
+```{r, echo=FALSE, results='hide'}
+
+
+#4x4 plots
+par(mfrow=c(2,2))
+
+#-----------------------
+# plot 1: beta(7,3) prior
+#-----------------------
+curve(dbeta(x,7,3),lwd=3,main='n=0 (prior)',cex.main=1.5,
+      ylab='Posterior Density',xlab='Theta',col=4)
+
+#---------------------------------
+# plot 2: n=2
+#---------------------------------
+y <- rbinom(2,size=1,p=.7)
+n <- length(y)
+curve(dbeta(x,7+sum(y),3+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+
+#---------------------------------
+# plot 3: n=10
+#---------------------------------
+y <- rbinom(5,size=1,p=.7)
+n <- length(y)
+curve(dbeta(x,7+sum(y),3+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+
+#---------------------------------
+# plot 4: n=20
+#---------------------------------
+y <- rbinom(10,size=1,p=0.7)
+n <- length(y)
+curve(dbeta(x,7+sum(y),3+n-sum(y)),col=4,lwd=3,cex.main=1.5,
+      main=paste0('n=',n,
+                                         '     Heads=',sum(y),
+                                         '     Tails=',n-sum(y)),
+         xlab="Theta",ylab='Posterior Density')
+
+#reset to one plot
+par(mfrow=c(1,1))
+```
+
+## Important Note {background-color="#02577b"}
+
+-   Prior selection can improve parameter estimation for small samples.
+-   Using non-informative priors still lets us use the Bayesian inference framework.
+
+## Posterior Sampling
+::: {.incremental}
+-   But there's a catch...
+-   In general we cannot find the closed form of the posterior.
+-   In this case we can still use Markov Chain Monte Carlo (MCMC) to simulate samples from the posterior distribution.
+:::
+## MCMC
+-   With MCMC we can still estimate expectations, probabilities and explore the posterior distribution.
+-   MCMC constructs a 'chain' of random samples which simulate draws from the posterior.
+
+```{r, echo=FALSE, results='hide'}
+
+
+x <- rnorm(150,.5,.1)
+
+par(mfrow=c(1,2))
+n=50
+plot(x[1:n],type='l',pch=16,main='Traceplot',ylab='Theta')
+points(x[1:n],pch=16,cex=.5)
+hist(x,probability=T,main='Estimated Posterior',xlab='Theta',breaks=20)
+
+#reset to one plot
+par(mfrow=c(1,1))
+```
+## Important Note {background-color="#02577b"}
+
+-   Remember the goal is still to use the posterior distribution for inference, MCMC is just a tool to simulate samples from the posterior.
+
+## Fair Coin: MCMC Samples
+How well is MCMC doing for our fair coin example?
+
+```{stan output.var = "coin_model"}
+data {
+  int<lower=0> n;
+  int<lower=0,upper=1> y[n];
+}
+parameters {
+  real<lower=0, upper=1> theta;
+}
+model {
+  theta ~ beta(1, 1);
+  for (i in 1:n)
+    y[i] ~ bernoulli(theta);
+}
+
+```
+
+```{r, echo=FALSE, results='hide'}
+
+library("rstan")
+
+par(mfrow=c(2,2))
+#---------------------------------
+# plot 1: n=2
+#---------------------------------
+y <- rbinom(2,size=1,p=0.5)
+n <- length(y)
+#sample
+fit <- sampling(coin_model,list(n=n,y=y),iter=2000,chains=1)
+#plot results
+params <- extract(fit)
+hist(params$theta,prob=T,main=paste0('n=',n,
+                                     '     Heads=',sum(y),
+                                     '     Tails=',n-sum(y)),
+     xlab="Theta",ylab='Posterior Density',breaks=20,
+     xlim=c(0,1))
+curve(dbeta(x,1+sum(y),1+n-sum(y)), add=TRUE,col=4,lwd=3)
+#---------------------------------
+# plot 1: n=10
+#---------------------------------
+y <- rbinom(10,size=1,p=0.5)
+n <- length(y)
+#sample
+fit <- sampling(coin_model,list(n=n,y=y),iter=2000,chains=1)
+#plot results
+params <- extract(fit)
+hist(params$theta,prob=T,main=paste0('n=',n,
+                                     '     Heads=',sum(y),
+                                     '     Tails=',n-sum(y)),
+     xlab="Theta",ylab='Posterior Density',breaks=20,
+     xlim=c(0,1))
+curve(dbeta(x,1+sum(y),1+n-sum(y)), add=TRUE,col=4,lwd=3)
+#---------------------------------
+# plot 1: n=30
+#---------------------------------
+y <- rbinom(30,size=1,p=0.5)
+n <- length(y)
+#sample
+fit <- sampling(coin_model,list(n=n,y=y),iter=2000,chains=1)
+#plot results
+params <- extract(fit)
+hist(params$theta,prob=T,main=paste0('n=',n,
+                                     '     Heads=',sum(y),
+                                     '     Tails=',n-sum(y)),
+     xlab="Theta",ylab='Posterior Density',breaks=20,
+     xlim=c(0,1))
+curve(dbeta(x,1+sum(y),1+n-sum(y)), add=TRUE,col=4,lwd=3)
+#---------------------------------
+# plot 1: n=100
+#---------------------------------
+y <- rbinom(100,size=1,p=0.5)
+n <- length(y)
+#sample
+fit <- sampling(coin_model,list(n=n,y=y),iter=2000,chains=1)
+#plot results
+params <- extract(fit)
+hist(params$theta,prob=T,main=paste0('n=',n,
+                                     '     Heads=',sum(y),
+                                     '     Tails=',n-sum(y)),
+     xlab="Theta",ylab='Posterior Density',breaks=20,
+     xlim=c(0,1))
+curve(dbeta(x,1+sum(y),1+n-sum(y)), add=TRUE,col=4,lwd=3)
+
+par(mfrow=c(1,1))
+```
+
+## Average Fish Length Example
+::: {.incremental}
+-   Suppose we want to investigate the effects of temperature and flow on average smallmouth bass YoY length at a given site ($Y_i$).
+-   Let, $$
+    Y_i = \beta_0 + \beta_T \cdot \text{Temp}_i + \beta_F\cdot\text{Flow}_i+\epsilon_i,
+    $$ where $\epsilon_i\sim N(0,\sigma)$.
+:::
+## Fish Length: Simulated Data
+
+Simulated data assuming $\beta_0^{\text{true}}=152$, $\beta_T^{\text{true}}=2$ and $\beta_F^{\text{true}}=-2$
+
+```{r}
+n <- 50
+beta_temp_true <- 2
+beta_flow_true <- -2
+temp <- rnorm(n,0,1)
+flow <- rnorm(n,0,1)
+int <- 152
+sigma <- 2
+Y <- int + beta_temp_true * temp + beta_flow_true * flow + rnorm(n,0,sigma)
+
+#plot sample
+par(mfrow=c(1,2))
+plot(temp,Y,pch=16,
+     ylab='Lengths (Y)',xlab='Standardized Temp',
+     main='Average fish length vs. standardized temp')
+abline(a=int,b=beta_temp_true,col='red')
+
+plot(flow,Y,pch=16,
+     ylab='Lengths (Y)',xlab='Standardized Flow',
+     main='Average fish length vs. standardized flow')
+abline(a=int,b=beta_flow_true,col='red')
+par(mfrow=c(1,1))
+```
+
+## Fish Length: Parameter Estimation
+
+-   The $\tt{rstanarm}$ package uses default mildly informative normal priors for the $\beta$'s and an exponential prior for $\sigma$.
+
+```{r}
+library(rstanarm)
+options(mc.cores = parallel::detectCores())
+
+modelData <- data.frame(Y,temp,flow)
+```
+
+```{r, echo=FALSE, results='hide'}
+
+
+m1 <- stan_glm(formula = Y ~ 1 + temp + flow, family = gaussian(),
+                 data = modelData,seed = 349, iter = 1000, chains = 3)
+```
+
+```{r, echo=FALSE}
+
+m1
+```
+
+## Fish Length: Posterior Samples.
+
+Simulated draws from posterior distribution for $\beta_T$
+
+```{r, echo=TRUE}
+
+plot(m1, "hist", regex_pars = "temp")
+```
+
+## Fish Length: Posterior Credible Intervals
+
+-   A 95% Posterior Credible Interval (PCI) is the interval which contains 95% of the central probability of the posterior distribution.
+-   If the PCI does not contain zero we can consider that parameter "significant".
+
+## Fish Length: 95% PCI
+
+```{r, echo=TRUE}
+
+library("bayesplot");library("ggplot2")
+
+mcmc_areas(as.matrix(m1),
+           pars = c("temp", "flow"),
+           prob = 0.8)
+```
+
+## Fish Length: Predictive Performance
+
+We can assess the models posterior predictive performance
+
+```{r, echo=TRUE}
+
+y_rep <- posterior_predict(m1)
+boxplot(y_rep,main='Posterior predictions vs true value (red points)',ylab='Prediction',xlab='index')
+points(Y,col='red',pch=16)
+```
+
+## Fish Length: Chain Convergence
+
+Overlapping chains provide evidence of convergence
+
+```{r, echo=TRUE}
+
+plot(m1, "trace", pars = c("temp"),
+     facet_args = list(nrow = 2))
+```
+
+## Fish Length: Chain Convergence
+
+-   $\hat{R}$ compares means and variance across and within chains.
+-   $\hat{R}$\<1.05 is considered good.
+-   Running chains longer can reduce $\hat{R}$.
+
+```{r, echo=TRUE}
+
+summary(m1)
+```
+
+## Fish Length: Effective Sample Size
+
+-   Autocorrelation of chains can reduce effective sample size.
+-   Leads to poor sampling from the posterior distribution.
+-   Reparametrizing priors or running chains longer can help.
+
+## Fish Length: Effective Sample Size
+
+Ratio of effective sample size and true chain-length
+
+```{r}
+ratios_m1 <- neff_ratio(m1)
+mcmc_neff(ratios_m1, size = 2)
+```
+
+## Fish Length: Model Comparison
+
+-   Lets consider we fit another model and want to compare its performance
+-   Lets drop the flow covariate, $$
+    Y_i = \beta_0+\beta_T\cdot \text{Temp}_i+\epsilon_i
+    $$
+
+```{r, echo=TRUE, results='hide'}
+
+m2 <- stan_glm(formula = Y ~ 1 + temp, family = gaussian(),
+                 data = modelData,seed = 349, iter = 1000, chains = 3)
+```
+
+```{r, echo=FALSE}
+
+summary(m2)
+```
+
+## Fish Length: Model Comparison
+
+-   Model performance can be compared with leave-on-out (loo) cross-validation.
+-   The preferred model (with higher elpd_loo) is given in the first row.
+
+```{r, echo=TRUE}
+
+loo_m1 <- loo(m1, cores = 2)
+loo_m2 <- loo(m2, cores=2)
+loo_compare(loo_m1, loo_m2)
+```
