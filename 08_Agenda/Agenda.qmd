@@ -1,0 +1,144 @@
+---
+title: |
+  ![](R_logo.png){width=1.0in}\linebreak\linebreak
+  Workshop 
+subtitle: "March 21-22, 2024"
+
+format: pdf
+editor: visual
+geometry:
+      - top=25.4mm
+      - left=25.4mm
+      - right=25.4mm
+      - bottom=25.4mm
+---
+
+
+::: {layout-ncol="2" layout-valign="top"}
+![](Fig1_pga.png){width="250" height="250"}
+
+![](Fig2_maps.png){width="300" height="300"}
+:::
+
+## Brief overview
+
+Based on the course survey, this workshop will focus much of the first day on an introduction to R. However, the workshop will also introduce Bayesian inference, hierarchical models, and Bayesian estimation using the R package [rstanarm](https://mc-stan.org/rstanarm/). More complicated model examples will be discussed that are coded in the stan programming language. A goal for a future workshop will be to discuss writing customized models in [stan](https://mc-stan.org/).
+
+{{< pagebreak >}}
+
+::: callout-important
+-   The workshop will be held in-person and virtually on *Thursday March 21 and Friday March 22*
+
+-   The workshop will be from *9am -- 4pm* each day
+
+-   Everyone will need a computer with [R](https://www.r-project.org/) and [RStudio](https://posit.co/products/open-source/rstudio/) installed (see below for required R packages to install)
+
+-   **Virtual attendance:**
+
+    -   I will send a Zoom link for virtual attendance a few days before the workshop
+
+-   **In-person attendance:**
+
+    -   Location: Penn State, [Ag Science & Industries Building (ASI)](https://maps.app.goo.gl/GJFL9aAKnLeuUuwY9) Room 118
+
+    -   Bring laptop (with charger) with [R](https://www.r-project.org/) and [RStudio](https://posit.co/products/open-source/rstudio/) installed
+
+-   **Course materials:**
+
+    -   I will post all course materials on GitHub. I will provide instructions for downloading the files prior to the workshop
+:::
+
+::: callout-note
+**In-person attendance:**
+
+-   Bring your own lunch or you can purchase lunch at the [PSU Creamery](https://creamery.psu.edu/) or [Saxbys](https://www.saxbyscoffee.com/location/saxbys-penn-state-university/) in the Business School. There will not be time for off campus dining
+
+-   Morning coffee and bagels (or similar) will be provided each day
+
+-   You should have access to Penn State's public WiFi, if needed
+
+-   **Parking:**
+
+    -   If you are driving a vehicle with a state license plate you can park for free in the [parking lot behind the Law School](https://maps.app.goo.gl/Z3JtNv9wuyCPJp226) -- which is across from the PSU Arboretum and just a few minute walk to the [Ag Science & Industries Building (ASI)](https://maps.app.goo.gl/GJFL9aAKnLeuUuwY9)
+
+    -   If you need to drive a personal vehicle let me know and I will get you a parking permit for the [East Deck](https://maps.app.goo.gl/fiDTncz1cvkacFwf8) parking garage
+:::
+
+{{< pagebreak >}}
+
+## Please download/install the following R packages
+
+```{r, echo=TRUE, eval=FALSE}
+library(dplyr) # data management
+library(tidyverse) # data management
+library(ggplot2) # plot
+library(lubridate) # dates
+library(stringr) # manipulate character stings
+library(sf) # spatial analysis/map creation
+library(spData) # spatial data
+library(car)  # logit function
+library(kableExtra) # making tables
+library(rstanarm) # Fit common regression models using stan
+library(bayesplot) # Visualize MCMC stan output
+library(rstan) # Fit Bayesian models
+library(loo) # Model comparison
+library(cmdstanr) # Fit Bayesian models
+library(mcmcplots) # as.mcmc function
+library(qs) # Save/read large files
+library(MCMCvis) # traceplots
+library(lme4) # fit hierarchical models (non-Bayesian)
+
+```
+
+{{< pagebreak >}}
+
+## Tentative Agenda
+
+### Day 1
+
+-   8am - 9am: Arrive, grab a seat, setup, coffee, talk
+
+-   9am - 10am: Introduction to R (reading in data, data manipulation, summaries)
+
+-   10am - 10:30am: Exercise 1 (Intro to R)
+
+-   11am - 12pm: Introduction to R (plotting data, fitting models, etc.)
+
+-   12pm - 1pm: Lunch
+
+-   1pm - 1:45pm: Exercise 2 (Intro to R)
+
+-   1:45pm - 2:45pm: Introduction to Bayesian estimation and inference
+
+-   2:45pm - 4:00pm: Introduction to hierarchical models
+
+### Day 2
+
+-   8am - 9am: Arrive, grab a seat, setup, coffee, talk
+
+-   9am - 10am: Review Day 1/hierarchical models
+
+-   10am - 11am: Introduction to `rstanarm`
+
+-   11am - 12pm: Exercise 3
+
+-   12pm - 1pm: Lunch
+
+-   1pm - 2pm: Exercise 4
+
+-   2pm - 4pm: Disucssions and illustrations of more complex models commonly used in fisheries and aquatic sciences
+
+    -   Chris Custer, PhD graduate student: The jsPGA model to predict the effects of climate changes on the abundance and distribution of fishes
+
+    -   Spatio-temporal von Bertalanffy growth model
+
+    -   Censored regression model
+
+## Questions?
+
+If you have any questions, concerns, or can no longer attend the workshop please let me know.
+
+### Contact information:
+
+-   Email: \href{mailto:txw19@psu.edu}{txw19@psu.edu}
+-   Cell phone: 814-360-7781
