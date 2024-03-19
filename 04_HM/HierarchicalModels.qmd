@@ -1,0 +1,1213 @@
+---
+title: "Hierarchical Models"
+author: "Ty Wagner"
+institute: "PACFWRU, Penn State University"
+date: today
+format:
+  revealjs:
+    highlight-style: github
+    slide-number: c/t
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(dplyr) # data management
+library(tidyverse)
+library(ggplot2) # plot
+library(lubridate) # dates
+library(bslib) # a modern UI toolkit for Shiny and R Markdown 
+library(stringr) # manipulate character stings
+library(sf) # map creation
+library(spData) # spatial data
+library(car)  # logit function
+library(ggmap) # Use Google Map services
+library(kableExtra) # making tables
+library(rstanarm) # Fit common regression models using Stan
+library(lme4) # fit hierarchical models
+library(ggrepel)
+
+```
+
+## 
+
+![](anakin.png){fig-align="center"}
+
+## Hierarchical models
+
+A model with three basic levels:
+
+::: incremental
+1.  **Observation model**: distribution of data given parameters (data level)
+
+2.  **Structural (latent process) model**: distribution of parameters, governed by hyperparameters (latent process level)
+
+3.  **Hyperparameter model** (parameter level)
+:::
+
+## Hierarchical models
+
+Some other definitions:
+
+::: incremental
+-   Estimating the population distribution of unobserved parameters (Gelman et al. 2004)
+
+-   Sharing statistical strength: we can make inferences about data-poor groups using the entire ensemble of data
+
+-   Pool (partially) across groups to obtain more reliable estimates for each group
+:::
+
+## An example
+
+::: incremental
+-   Let's say we are interested in making inferences about many parameters corresponding to different "units" these "units" could be individual fish, lakes, streams, ecoregions, etc.
+
+-   A goal is often to make predictions about *new* units.
+
+-   Further, let's suppose that you measured the rate at which workshop participants chugged a gallon of milk (quantified as the time to empty a gallon of milk) for several individuals.
+:::
+
+## An example
+
+::: columns
+::: {.column width="80%"}
+::: incremental
+-   We recognize that it is unlikely that all individuals have the same milk chugging rate, but we also recognize that knowing something about the others tells us something about the person of, interest (Paul, in this case).
+
+-   Our inclination, therefore, is towards an assumption somewhere between the unit-specific parameters being identical and being entirely independent.
+
+-   They are **similar, but not identical"**
+:::
+:::
+
+::: {.column width="20%"}
+![](milk.png){fig-align="center"}
+:::
+:::
+
+## Hierarchical model example
+
+This "similar, but not identical" can be shown to be mathematically equivalent to assuming that unit-specific parameters, $\theta_i, i = 1\ldots,N$, arise from a common "population" distribution whose parameters are unknown (and assigned appropriate prior distributions)
+
+$$\theta_i \sim N(\mu,\sigma^2)$$
+
+$$\mu \sim N(.,.);   \quad \sigma \sim unif(.,.)$$
+
+## Visualization
+
+![](HM_FIG1.png){fig-align="center"}
+
+## Compared to traditional models
+
+![](HM_FIG2.png){fig-align="center"}
+
+## Hierarchical model
+
+::: columns
+::: {.column width="60%"}
+In this hierarchical model we learn about the parameters governing a single unit of interest $i$ ($\theta_i$) not only directly through observations on unit $i$ ($y_i$), but also indirectly through data collected on other units ($y_n$) via the population distribution, parameterized by $\phi$.
+:::
+
+::: {.column width="40%"}
+![](HM_FIG1.png)
+:::
+:::
+
+## Random intercept model
+
+$$
+y_i \sim N \left(\alpha_{j(i)},\sigma^2 \right) , \quad \text{for}\; i,\ldots n 
+$$
+
+$$
+\alpha_j \sim N \left(\mu_\alpha,\sigma^2_\alpha \right) ,\quad  \text{for}\; j,\ldots J 
+$$ - $y_i$ is assumed normally distributed with a mean that depends on a group-specific (e.g., lake, river, etc.) parameter, $\alpha_j$, and these $\alpha_j$'s come from a common population distribution, with a grand mean $\mu_\alpha$ and among-group variation quantified in $\sigma^2_\alpha$.
+
+-   The parameter $\sigma^2$ is the within-region variance. The $j(i)$ indicates that observation $i$ is located in group $j$.
+
+## Fully specified Bayesian model
+
+$$
+y_i \sim N \left(\alpha_{j(i)},\sigma^2 \right) , \quad \text{for}\; i,\ldots n 
+$$
+
+$$
+\alpha_j \sim N \left(\mu_\alpha,\sigma^2_\alpha \right) ,\quad  \text{for}\; j,\ldots J 
+$$ Diffuse priors:
+
+$\mu_\alpha \sim N(0, 100)$, $\sigma \sim unif(0,5)$, and $\sigma_\alpha \sim unif(0,5)$.
+
+## Why hierarchical models?
+
+Fisheries data are characterized by:
+
+-   Observations measured at multiple spatial and/or temporal scales
+
+-   An uneven number of observations measured for any given subject or group of interest (i.e., unbalanced designs)
+
+-   Observations that lack independence
+
+-   Widely applicable to many (most) ecological investigations
+
+## Why hierarchical models?
+
+[Have been described as a "unifying framework for statistical modeling in fisheries biology" (Thorson and Minto 2014; *ICES Journal of Marine Science*)]{style="color:blue;"}
+
+-   A generic solution to non-independence
+
+-   A unifying framework for disparate statistical methods such as time-series, spatial, individual-based
+
+-   Increasingly practical to implement and customize
+
+## Desirable properties of hierarchical models
+
+::: incremental
+-   Accommodate lack of statistical independence
+
+-   Scope of inference
+
+-   Quantify and model variability at multiple levels
+
+-   Ability to *borrow strength* from the entire ensemble of data
+:::
+
+## Borrowing strength
+
+-   Make use of all available information
+
+-   Results in estimators that are a weighted composite of information from an individual group (e.g., species, individual, lake, etc.) and the relationships that exist in the overall sample (*partial pooling*)
+
+## Borrowing strength
+
+Estimating group-specific intercepts and slopes
+
+::: incremental
+-   Could fit separate ordinary least squares (OLS) regressions to each group (e.g., reservoir) and obtain estimate of a slope and intercept
+
+-   OLS will give estimates of parameters, however, they may not be very accurate for any given group
+
+-   Depends on sample size within a group ($n_j$) and the range represented in the predictor variable, $X_{ij}$
+:::
+
+## Borrowing strength
+
+Estimating group-specific intercepts and slopes
+
+-   Depends on sample size within a group ($n_j$) and the range represented in the level-1 predictor variable, $X_{ij}$
+
+::: incremental
+-   If $n_j$ is small then intercept estimate will be imprecise
+
+-   If sample size is small or a restricted range of $X$, the slope estimate will be imprecise
+
+-   Hierarchical models allow for taking into account the imprecision of OLS estimates
+:::
+
+## Borrowing strength
+
+-   More weight to the grand mean when there are few observations within a group and when the group variability is large compared to the between-group variability
+
+::: incremental
+-   E.g., small sample size for a given group = not very precise OLS estimate, so value "shrunk" towards population mean
+
+-   More weight is given to the observed groups mean if the opposite is true
+:::
+
+## Borrowing strength
+
+-   Thus, hierarchical models accounts and allows for the small sample sizes observed in some groups
+
+::: incremental
+-   Same is true for the range represented in predictor variables (i.e.., hierarchical models accounts and allows for the small and limited ranges of $X$ observed in some groups)
+:::
+
+## Varying intercept model
+
+$$
+y_i \sim N \left(\alpha_{j(i)},\sigma^2 \right) , \quad \text{for}\; i,\ldots n 
+$$
+
+$$
+\alpha_j \sim N \left(\mu_\alpha,\sigma^2_\alpha \right) ,\quad  \text{for}\; j,\ldots J 
+$$
+
+Total variance = $\sigma^2 + \sigma^2_\alpha$
+
+$ICC = \sigma^2_\alpha/(\sigma^2 + \sigma^2_\alpha)$
+
+$ICC$ = intraclass correlation coefficient: proportion of the total variance that is *between* groups
+
+## Partial pooling
+
+Shrinkage towards the grand mean ($\mu_\alpha$)
+
+-   The estimate of $\alpha_j$ is a linear combination of the population-average estimate $\mu_\alpha$ and the ordinary least squares (OLS) estimate, $\alpha^{OLS}$
+
+$$
+\alpha_j = w_j \times \alpha^{OLS} + (1 - w_j) \times \mu_\alpha
+$$
+
+The weight, $w_j$ is a ratio of the between group variability ($\sigma^2_\alpha$) to the sum of the within and between-group variability (i.e., total variability)
+
+## Partial pooling
+
+$$
+w_j = \frac{n_j \times \sigma^2_\alpha}{n_j \times \sigma^2_\alpha + \sigma^2}
+$$
+
+$n_j$ = sample size
+
+So...small $n$ and/or low among group variability = shrinkage towards grand mean
+
+## Partial pooling illustration
+
+-   Simulate data in R with different $ICC$
+
+-   Data generating model is the varying intercept model:
+
+$$
+y_i \sim N \left(\alpha_{j(i)},\sigma^2 \right) , \quad \text{for}\; i,\ldots n 
+$$
+
+$$
+\alpha_j \sim N \left(\mu_\alpha,\sigma^2_\alpha \right) ,\quad  \text{for}\; j,\ldots J 
+$$ - Estimate $\alpha_j$ and evaluate partial pooling that has occurred
+
+## Simulation \# 1
+
+```{r, echo=TRUE, eval=TRUE}
+# Mean for distribution of group means (population-average)
+g.0 <- 1.15
+# SD for level-1 sd (within-group sd)
+sigma.y <- 0.28
+# SD for level-2 sd (among-group sd)
+sigma.a <- 0.20
+# Intraclass correlation coefficient
+round(sigma.a^2/(sigma.a^2 + sigma.y^2),2)
+# Number of groups (e.g., lakes)
+J = 50
+```
+
+```{r, include=FALSE}
+#Number of samples per group (allow n to vary by group)
+# set.seed(12358)
+n <- round(abs(rnorm(J, mean=2,sd=30))+1)
+
+range(n)
+
+# Create site indicator
+site <- numeric()
+for(i in 1:J){
+	a<-rep(i,n[i])
+	site<-append(site,a)
+}
+# site
+
+################
+#Simulate varying coefficients (alpha j's)
+################
+a.true <- rep(NA,J)
+for(j in 1:J){
+	a.true[j]<-rnorm(1, g.0, sigma.a)
+}
+a.true
+
+####################
+#Simulate fake data
+####################
+y.fake <- rep(NA, length(site))
+for(i in 1:length(site)){
+	y.fake[i] <- rnorm(1, a.true[site[i]], sigma.y)
+}
+# y.fake
+
+##########################################
+######## END Data simulation #############
+##########################################
+
+# Create dataframe of data
+dat <- data.frame(y.fake,site)
+dat
+
+head(dat)
+# Create site as a factor and call group
+dat$group <- as.factor(dat$site)
+```
+
+## The data
+
+```{r}
+str(dat)
+
+dat %>% 
+  group_by(site) %>% 
+  summarise(mean = mean(y.fake), n = n())
+
+```
+
+```{r, include=FALSE}
+samp.size <- dat %>%
+  group_by(site) %>%
+  summarise(n = n())
+
+dat <- dat %>%
+  left_join(samp.size, by = 'site') %>%
+  mutate(n = as.numeric(n))
+```
+
+## The data
+
+```{r, eval=TRUE, echo=FALSE, fig.align='center'}
+ggplot(dat, aes(x = group, y = y.fake, fill=n)) +
+  geom_boxplot() +
+  scale_fill_viridis_c(option = "magma") +
+  theme_bw() +
+  geom_hline(yintercept=g.0, linetype="dashed",
+             color = "red", linewidth=1) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0)) +
+  labs(title = "", y = "Response variable (Y)", x = "Group #", fill = 'Sample\n size')
+
+
+```
+
+```{r, include=FALSE}
+# Stan fit
+m1a <- rstanarm::stan_glm(formula = y.fake ~  -1 + as.factor(group),
+                 family = gaussian,
+                 data = dat,
+                 seed = 349, iter = 3000, chains = 3)
+# summary(m1)
+# Grab posterior samples
+posteriora <- as.data.frame(m1a)
+
+# Grab random intercepts
+rand.intsa <- posteriora[, grep("as.", colnames(posteriora)) ]
+
+
+rand.ints2a  <- rand.intsa %>%
+  pivot_longer(cols = everything()) %>%
+  mutate(name = factor(name)) %>%
+  group_by(name) %>%
+  summarise(mean = mean(value),
+            upper = quantile(value, 0.975),
+            lower = quantile(value, 0.025))
+
+rand.ints2a <- data.frame(rand.ints2a, samp.size)
+
+
+# Stan fit - hierarchical model
+
+m1 <- stan_glmer(formula = y.fake ~  1 +
+                   (1 | group),
+                 family = gaussian,
+                 data = dat,
+                 seed = 349, iter = 2000, chains = 3)
+# summary(m1)
+# Grab posterior samples
+posterior <- as.data.frame(m1)
+
+# Grab random intercepts
+rand.ints <- posterior[, grep("b", colnames(posterior)) ]
+# Grab overall intercept
+int <- posterior[, "(Intercept)"]
+# Calculate group means
+rand.ints <- rand.ints + int
+
+rand.ints2  <- rand.ints %>%
+  pivot_longer(cols = everything()) %>%
+  mutate(name = factor(name)) %>%
+  group_by(name) %>%
+  summarise(mean = mean(value),
+         upper = quantile(value, 0.975),
+         lower = quantile(value, 0.025))
+
+rand.ints2 <- data.frame(rand.ints2, samp.size)
+
+
+```
+
+## Fixed effect vs. hierarchical model (ICC = 34%)
+
+```{r, echo=FALSE, eval=TRUE}
+#| layout-ncol: 2
+#| fig-width: 9
+#| fig-height: 9
+#| out-width: 9in
+#| out-height: 9in
+
+ggplot(rand.ints2a, aes(site, mean)) +
+  geom_pointrange(aes(ymax=upper, ymin=lower, color=n),size=0.5) +
+  scale_colour_viridis_c(option = "magma") +
+  geom_hline(yintercept=g.0, linetype="dashed",
+             color = "red", linewidth=1) +
+  labs(title = "", y = "Estimate", x = "Group #", color = 'Sample\n size') +
+  ylim(0.5, 2)
+
+ggplot(rand.ints2, aes(site, mean)) +
+  geom_pointrange(aes(ymax=upper, ymin=lower, color=n),size=0.5) +
+  scale_colour_viridis_c(option = "magma") +
+  geom_hline(yintercept=g.0, linetype="dashed",
+             color = "red", linewidth=1) +
+  labs(title = "", y = "Estimate", x = "Group #", color = 'Sample\n size') +
+  ylim(0.5,2)
+
+
+```
+
+## Simulation \# 2
+
+```{r, echo=TRUE, eval=TRUE}
+# Mean for distribution of group means (population-average)
+g.0 <- 1.15
+# SD for level-1 sd (within-group sd)
+sigma.y <- 0.28
+# SD for level-2 sd (among-group sd)
+sigma.a <- 0.10
+# Intraclass correlation coefficient
+round(sigma.a^2/(sigma.a^2 + sigma.y^2),2)
+# Number of groups (e.g., lakes)
+J = 50
+```
+
+```{r, include=FALSE}
+#Number of samples per group (allow n to vary by group)
+# set.seed(12358)
+n <- round(abs(rnorm(J, mean=2,sd=30))+1)
+
+range(n)
+
+# Create site indicator
+site <- numeric()
+for(i in 1:J){
+	a<-rep(i,n[i])
+	site<-append(site,a)
+}
+# site
+
+################
+#Simulate varying coefficients (alpha j's)
+################
+a.true <- rep(NA,J)
+for(j in 1:J){
+	a.true[j]<-rnorm(1, g.0, sigma.a)
+}
+a.true
+
+####################
+#Simulate fake data
+####################
+y.fake <- rep(NA, length(site))
+for(i in 1:length(site)){
+	y.fake[i] <- rnorm(1, a.true[site[i]], sigma.y)
+}
+# y.fake
+
+##########################################
+######## END Data simulation #############
+##########################################
+
+# Create dataframe of data
+dat <- data.frame(y.fake,site)
+dat
+
+head(dat)
+# Create site as a factor and call group
+dat$group <- as.factor(dat$site)
+```
+
+## The data
+
+```{r}
+str(dat)
+
+dat %>% 
+  group_by(site) %>% 
+  summarise(mean = mean(y.fake), n = n())
+
+```
+
+```{r, include=FALSE}
+samp.size <- dat %>%
+  group_by(site) %>%
+  summarise(n = n())
+
+dat <- dat %>%
+  left_join(samp.size, by = 'site') %>%
+  mutate(n = as.numeric(n))
+```
+
+## The data
+
+```{r, eval=TRUE, echo=FALSE, fig.align='center'}
+ggplot(dat, aes(x = group, y = y.fake, fill=n)) +
+  geom_boxplot() +
+  scale_fill_viridis_c(option = "magma") +
+  theme_bw() +
+  geom_hline(yintercept=g.0, linetype="dashed",
+             color = "red", linewidth=1) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0)) +
+  labs(title = "", y = "Response variable (Y)", x = "Group #", fill = 'Sample\n size')
+
+
+```
+
+```{r, include=FALSE}
+# Stan fit
+m1a <- rstanarm::stan_glm(formula = y.fake ~  -1 + as.factor(group),
+                 family = gaussian,
+                 data = dat,
+                 seed = 349, iter = 3000, chains = 3)
+# summary(m1)
+# Grab posterior samples
+posteriora <- as.data.frame(m1a)
+
+# Grab random intercepts
+rand.intsa <- posteriora[, grep("as.", colnames(posteriora)) ]
+
+
+rand.ints2a  <- rand.intsa %>%
+  pivot_longer(cols = everything()) %>%
+  mutate(name = factor(name)) %>%
+  group_by(name) %>%
+  summarise(mean = mean(value),
+            upper = quantile(value, 0.975),
+            lower = quantile(value, 0.025))
+
+rand.ints2a <- data.frame(rand.ints2a, samp.size)
+
+
+# Stan fit - hierarchical model
+
+m1 <- stan_glmer(formula = y.fake ~  1 +
+                   (1 | group),
+                 family = gaussian,
+                 data = dat,
+                 seed = 349, iter = 2000, chains = 3)
+# summary(m1)
+# Grab posterior samples
+posterior <- as.data.frame(m1)
+
+# Grab random intercepts
+rand.ints <- posterior[, grep("b", colnames(posterior)) ]
+# Grab overall intercept
+int <- posterior[, "(Intercept)"]
+# Calculate group means
+rand.ints <- rand.ints + int
+
+rand.ints2  <- rand.ints %>%
+  pivot_longer(cols = everything()) %>%
+  mutate(name = factor(name)) %>%
+  group_by(name) %>%
+  summarise(mean = mean(value),
+         upper = quantile(value, 0.975),
+         lower = quantile(value, 0.025))
+
+rand.ints2 <- data.frame(rand.ints2, samp.size)
+
+
+```
+
+## Fixed effect vs. hierarchical model (ICC = 11%)
+
+```{r, echo=FALSE, eval=TRUE}
+#| layout-ncol: 2
+#| fig-width: 9
+#| fig-height: 9
+#| out-width: 9in
+#| out-height: 9in
+
+ggplot(rand.ints2a, aes(site, mean)) +
+  geom_pointrange(aes(ymax=upper, ymin=lower, color=n),size=0.5) +
+  scale_colour_viridis_c(option = "magma") +
+  geom_hline(yintercept=g.0, linetype="dashed",
+             color = "red", linewidth=1) +
+  labs(title = "", y = "Estimate", x = "Group #", color = 'Sample\n size') +
+  ylim(0.5, 2)
+
+ggplot(rand.ints2, aes(site, mean)) +
+  geom_pointrange(aes(ymax=upper, ymin=lower, color=n),size=0.5) +
+  scale_colour_viridis_c(option = "magma") +
+  geom_hline(yintercept=g.0, linetype="dashed",
+             color = "red", linewidth=1) +
+  labs(title = "", y = "Estimate", x = "Group #", color = 'Sample\n size') +
+  ylim(0.5,2)
+
+
+```
+
+## Analysis of covariance (ANCOVA)
+
+-   A model with an interaction between a discrete and continuous covariates
+
+-   We are often interested in if the slope and intercept differ between two or more groups
+
+$$
+y_i = \alpha_{j(i)} + \beta_{j(i)} \times cov_i + \epsilon_i, \quad \epsilon_i \sim N\left(0, \sigma^2\right)
+$$
+
+## Varying intercept, varying slope HM
+
+-   Often of great interest to allow slopes (i.e., the effects of covariates) to vary by some grouping factor
+
+::: incremental
+-   Assumption that many processes are spatially/temporally homogeneous or invariant may not be valid
+
+    -   e.g., spatial variation in the a stressor – response relationship may vary depending on local landscape features
+:::
+
+## Varying intercept, varying slope HM
+
+Recall the varying intercept model
+
+$$
+y_i \sim N \left(\alpha_{j(i)},\sigma^2 \right) , \quad \text{for}\; i,\ldots n 
+$$
+
+$$
+\alpha_j \sim N \left(\mu_\alpha,\sigma^2_\alpha \right) ,\quad  \text{for}\; j,\ldots J 
+$$
+
+## Varying intercept, varying slope HM
+
+Add a single varying slope
+
+$$
+y_i \sim N \left(\alpha_{j(i)} + \beta_{j(i)} \cdot x_i,\sigma^2 \right) , \quad \text{for}\; i,\ldots n 
+$$ $$
+\begin{pmatrix} \alpha_j \\ \beta_j \end{pmatrix} \sim N \left(\begin{pmatrix}\mu_\alpha \\ 
+\mu_\beta \end{pmatrix},\begin{pmatrix} \sigma_\alpha^2 & \rho  \sigma_\alpha \sigma_\beta\\ \rho  \sigma_\alpha \sigma_\beta & \sigma_\beta^2  \end{pmatrix}\right),  \textrm{ for } \quad j = 1, \ldots J
+$$
+
+## Varying intercept, varying slope HM
+
+-   Simulate some data: $\mu_\alpha$ = 0.50, $\mu_\beta$ = -0.20
+
+-   Compare least squares `lm` estimates to hierarchical model (`hm`) estimates
+
+```{r, include=FALSE}
+
+######## Data simulation function #####
+#######################################
+###    Function arguement definitions #
+#######################################
+# J = Number of groups (e.g., ecoregions)
+# n.lower = lower number of sample units (e.g., lakes) per group
+# n.upper = upper number of sample units (e.g., lakes) per group
+# mu.a.true = Grand-mean intercept
+# sigma.y.true = SD for level-1
+# sigma.a.true = SD for intercepts
+# sigma.b.true = SD for slopes
+## CSI parameters
+# gamma.b.0 <- Intercept term in relationship between level-2 predictor and level-1 slope parameters (i.e., slopes of x1-y regression)
+# gamma.b.1 Slope-effect of z1 on slopes in relationship between x1 and y
+
+
+################### FUNCTION FOR SIMULATING BIVARIATE NORMAL DATA
+rbivariate <- function(mean.x = 70, sd.x=3, mean.y=162, sd.y=14, r=.50, iter=100) {
+  z1 <- rnorm(iter)
+  z2 <- rnorm(iter)
+  x <- sqrt(1-r^2)*sd.x*z1 + r*sd.x*z2 + mean.x
+  y <- sd.y*z2 + mean.y
+  return(list(x,y))
+}
+################################################
+
+DataSim <- function(J=9, n.lower=1, n.upper=20, mu.a=0.50, sigma.y=0.30, sigma.a=0.25, sigma.b=0.05, gamma.b.0=-0.2,
+                    gamma.b.1=0, censorlevel=0.0){
+  # Create a vector that repeats the number of lakes per region
+  n <- round(runif(J, n.lower, n.upper))
+  # Rep region-specific sample sizes
+  site <- numeric()
+  for(i in 1:J){
+    a <- rep(i,n[i])
+    site <- append(site,a)
+  }
+  # Level-2 covariate
+  # z1 <- seq(-0.003, 0.40, length=J)
+  # Level-1 covariate: varies randomly across regions and across range of predictor variable
+  x1 <- numeric()
+  for(i in 1:J){
+    b <- runif(n[i],-0.83, 1.75)
+    x1<-append(x1,b)
+  }
+  # Simulate varying coefficients from bivariate normal
+  params <- rbivariate(mean.x = mu.a, sd.x = sigma.a,
+                       mean.y = gamma.b.0, sd.y = sigma.b, r = -0.05, iter=J)
+  # Simulate fake lognormally distributed data
+  y.fake <- exp(rnorm(sum(n), params[[1]][site] + params[[2]][site] * x1 , sigma.y) )
+  # z1.full <- z1[site]
+  y.fake <- log(y.fake)
+  dat <- data.frame(y.fake, site, x1)
+  ## Create replicate y.fake for future analyses
+  dat$y.fake2 <- dat$y.fake
+  dat_list <- list(dat, params)
+  # Left-censor data
+  # censor <- quantile(dat$y.fake2, censorlevel)
+  # censor2 <- rep(censor, sum(n))
+  # dat <- data.frame(dat, censor2)
+  # ### Censor data (data < 30th percentile is censored)
+  # dat$detect <- ifelse(dat$y.fake < censor,0,1)
+  # # Detection limit is same for all observations
+  # dat$dl <- as.numeric(censor)
+  # # If an observation was not detected then set to NA
+  # dat$y.fake[dat$detect==0] <- NA
+  # # Set dl to 1000 for detect == 1
+  # dat$dl[dat$detect==1] <- 1000
+  return( dat_list )
+
+}
+
+
+datSim <- DataSim()
+dat <- datSim[[1]]
+# head(dat)
+# dim(dat)
+
+
+```
+
+## The data with `lm` fits
+
+```{r, eval=TRUE, echo=FALSE}
+# Raw data with lm fit
+ggplot(data=dat, aes(x1,y.fake2))+
+  geom_point( size=1)+
+  theme_bw()+
+  stat_smooth(method='lm') +
+  facet_wrap(.~site, scales="free") +
+  theme(panel.grid = element_blank(),strip.background = element_blank())+
+  xlab('X') +
+  ylab('Y') +
+  theme(legend.position = "none", axis.title = element_text(size=12), axis.text = element_text(size=12))
+
+```
+
+```{r, include=FALSE}
+
+m1 <- stan_lmer(y.fake2 ~ 1 + x1 + (1 + x1|site), data=dat,
+                seed = 349, iter = 2000, chains = 3)
+# print(m1)
+# coef(m1)
+
+# Grab mcmc draws for intercepts and slopes
+fits <- m1 %>%
+  as_tibble() %>%
+  rename(intercept = `(Intercept)`) %>%
+  select(-starts_with("Sigma") )
+
+
+# plot https://www.tjmahr.com/visualizing-uncertainty-rstanarm/
+
+############ Function to sum to get random intercept and slopes
+shift_draws <- function(draws) {
+  sweep(draws[, -1], MARGIN = 1, STATS = draws[, 1], FUN = "+")
+}
+###################################
+
+# Extract population average intercept and random intercepts for adding to get random intercept values
+ints <- fits %>%
+  select(intercept, starts_with("b[(Intercept)"))
+# Calculate random intercepts
+rand.ints <- shift_draws(as.matrix(ints))
+# Add new olumn names to random intercepts
+rand.ints <- as_tibble(rand.ints, .name_repair = ~paste0("int", 1:dim(rand.ints)[2]))
+head(rand.ints)
+
+# Extract population average slope and random slopes for adding to get random intercept values
+slopes <- fits %>%
+  select(x1, starts_with("b[x1"))
+# Calculate random slopes
+rand.slopes <- shift_draws(as.matrix(slopes))
+# Add new olumn names to random intercepts
+rand.slopes <- as_tibble(rand.slopes, .name_repair = ~paste0("slope", 1:dim(rand.slopes)[2]))
+head(rand.slopes)
+apply(rand.slopes, 2, mean)
+# Number of MCMC samples
+n_samps <- dim(ints)[1]
+# Create new predictor and design matrix
+x_new <- data.frame(seq(min(dat$x1), max(dat$x1), length = 50) )
+x_new$int <- 1
+x_new <- cbind(x_new$int, x_new$seq.min.dat.x1...max.dat.x1...length...50.)
+# Container to hold predictions
+post_pred = array(NA, dim = c(n_samps, dim(x_new)[1], dim(rand.ints)[2]) )
+for(j in 1:dim(rand.ints)[2]){
+  BETA <- as.matrix(cbind(rand.ints[,j], rand.slopes[,j]))
+  for(i in 1:n_samps){
+    post_pred[i,, j] = x_new %*% BETA[i,]
+  }
+}
+
+dim(post_pred)
+str(post_pred)
+# Posterior means
+post_mean <- apply(post_pred, c(2,3), mean)
+post_mean <- as_tibble(post_mean, .name_repair = ~paste0("site", 1:dim(post_mean)[2]))
+# Add x for plotting
+post_mean <- cbind(x_new[,2], post_mean)
+post_mean <- post_mean %>%
+  rename(X = 'x_new[, 2]')
+dim(post_mean)
+head(post_mean)
+
+post_mean <- post_mean %>%
+  pivot_longer(cols=c(starts_with("site")),
+                    names_to='site',
+                    values_to='Mean') %>%
+  arrange(site)
+
+post_mean$site <- rep(1:dim(rand.ints)[2], each = dim(x_new)[1])
+
+# Lower 95% CI
+lower <- apply(post_pred, c(2,3), quantile, c(0.025))
+lower <- as_tibble(lower, .name_repair = ~paste0("site", 1:dim(lower)[2]))
+# dim(lower)
+# head(lower)
+
+lower <- lower %>%
+  pivot_longer(cols=c(starts_with("site")),
+               names_to='site',
+               values_to='lower') %>%
+  arrange(site)
+
+# Upper 95% CI
+upper <- apply(post_pred, c(2,3), quantile, c(0.975))
+upper <- as_tibble(upper, .name_repair = ~paste0("site", 1:dim(upper)[2]))
+# dim(upper)
+# head(upper)
+
+upper <- upper %>%
+  pivot_longer(cols=c(starts_with("site")),
+               names_to='site',
+               values_to='upper') %>%
+  arrange(site)
+
+
+
+plot.dat <- data.frame(post_mean, lower, upper)
+# head(plot.dat)
+
+plot.dat$site <- as.factor(plot.dat$site)
+dat$site <- as.factor(dat$site)
+
+```
+
+## The data with `hm` fits
+
+```{r, echo=FALSE}
+ggplot() +
+  geom_point(data=dat, aes(x=x1, y = y.fake2)) +
+  geom_ribbon(data=plot.dat, aes(x=X, ymax=upper, ymin=lower),  alpha=.15) +
+  geom_line(data = plot.dat, aes(x = X, y = Mean), lwd=1) +
+  facet_wrap(~site) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),strip.background = element_blank())+
+  xlab('X') +
+  ylab('Y') +
+  theme(legend.position = "none", axis.title = element_text(size=12), axis.text = element_text(size=12))
+
+```
+
+## Compare estimates
+
+```{r, include=FALSE}
+# Plot estimated and true regression parameters
+
+# True parameters
+beta0_true <- as.vector(unlist(datSim[[2]][1]))
+beta1_true <- as.vector(unlist(datSim[[2]][2]))
+
+# lm parameters
+lm1 <- lm(y.fake2 ~ -1 + x1*site - x1, data=dat)
+summary(lm1)
+lm_ints <- as.vector(coef(lm1)[1:dim(rand.ints)[2]])
+lm_slopes <- as.vector(coef(lm1)[(dim(rand.ints)[2]+1):(dim(rand.ints)[2]*2)])
+# Parameter SEs
+int_lm_ses <- as.vector(summary(lm1)$coefficients[, 2][1:dim(rand.ints)[2]])
+slope_lm_ses <- as.vector(summary(lm1)$coefficients[, 2][(dim(rand.ints)[2]+1):(dim(rand.ints)[2]*2)])
+
+
+# Bayes parameters
+hm_ints <- as.vector(apply(rand.ints, 2, mean))
+hm_slopes <- as.vector(apply(rand.slopes, 2, mean))
+hm_ints_ses <- as.vector(apply(rand.ints, 2, sd))
+hm_slopes_ses <- as.vector(apply(rand.slopes, 2, sd))
+
+# Combine
+intercepts <- c(beta0_true, lm_ints, hm_ints)
+slopes <- c(beta1_true, lm_slopes, hm_slopes)
+ses_ints <- c(rep(0, dim(rand.ints)[2]), int_lm_ses, hm_ints_ses)
+ses_slopes <- c(rep(0, dim(rand.ints)[2]), slope_lm_ses, hm_slopes_ses)
+
+estimates <- rep(c("Truth", "lm", "HM"), each = dim(rand.ints)[2])
+parameter <- rep(c("Intercept", "Slope"), each = dim(rand.ints)[2] * 3)
+site <- rep(1:dim(rand.ints)[2])
+
+plot.dat2 <- data.frame(Model = c(estimates, estimates),
+                        Parameter = parameter,
+                        Value = c(intercepts, slopes),
+                        SE = c(ses_ints, ses_slopes),
+                        site = c(site, site, site, site, site, site))
+
+
+```
+
+```{r, echo=FALSE}
+# ggplot(plot.dat2, aes(x = Value, y = site, xmin = Value-SE, xmax = Value+SE, color = Model)) +
+#   facet_wrap(~Parameter)+
+#   geom_point() +
+#   geom_errorbarh(height=.2) +
+#   theme_bw() +
+#   scale_y_continuous(breaks=seq(1,dim(rand.ints)[2],1)) +
+#   # theme(panel.grid = element_blank(),strip.background = element_blank())+
+#   xlab('Parameter values') +
+#   ylab('Site number') +
+#   theme(legend.position = "top", axis.title = element_text(size=12), axis.text = element_text(size=12),
+#         legend.title = element_text(size=20), legend.text = element_text(size=20)) +
+#   guides(color = guide_legend(override.aes = list(size=4)))
+
+pd <- position_dodge(0.8)
+ggplot(plot.dat2, aes(x=site, y=Value,
+                     color = Model)) +
+  geom_errorbar(aes(ymin=Value-SE, ymax=Value+SE), width=.1, position=pd) +
+  geom_point(position=pd, size=2.0) +
+  facet_wrap(~Parameter) +
+  scale_x_continuous(breaks=seq(1,dim(rand.ints)[2],1)) +
+  ylab('Parameter values') +
+  xlab('Site number') +
+  theme_bw() +
+  theme(legend.position = "top", axis.title = element_text(size=12), axis.text = element_text(size=12),
+        legend.title = element_text(size=20), legend.text = element_text(size=20)) +
+  guides(color = guide_legend(override.aes = list(size=4)))
+
+
+
+```
+
+## New Zealand Mudsnail in PA inland waters
+
+![](NZM.png)
+
+```{r, include=FALSE}
+
+# Read in NZM data
+nzm_dat <- read_csv("../02_Data/NZM_data/NZM Presence_Absence Dataset.csv")
+
+str(nzm_dat)
+
+# Clean data
+nzm_dat <- nzm_dat %>%
+  mutate(Present_Absent = factor(Present_Absent),
+         observation_date = dmy(observation_date),
+         year = year(observation_date)) %>%
+  mutate(yvar = if_else(Present_Absent == "P", 1, 0)) %>%
+  rename("long" = x,
+         "lat" = y)
+
+
+# Get summary statistics
+t1nzm <- nzm_dat %>%
+  group_by(year) %>%
+  summarize(n = n(), Proportion_occupied = round(mean(yvar),2) )
+
+```
+
+## New Zealand Mudsnail (NZM)
+
+-   Sampled across PA waterbodies since 2020
+
+```{r, echo=FALSE, eval=TRUE}
+# Map sites
+# Make NZM a sf object for plotting unique Lat/Long sites
+nzm_map <- nzm_dat %>%
+  st_as_sf(coords = c("long", "lat"), crs = 4326)
+
+# Use Google API to grab map of PA
+get_map(location = 'pennsylvania', zoom=7, color="bw", maptype = "terrain") %>%
+  ggmap() +
+  geom_sf(data = nzm_map, size = 3,aes(colour=Present_Absent), alpha=0.15, inherit.aes = FALSE) +
+  geom_sf(data = nzm_map, size = 3,aes(colour=Present_Absent), shape=1, inherit.aes = FALSE) +
+  ylab("Latitude") +
+  xlab("Longitude") +
+  labs(color='Present/absent')
+```
+
+## Proportion of sites with NZM
+
+```{r, echo=FALSE}
+t1nzm %>%
+  kbl(caption = " ",
+      col.names = c("Year",
+                    "N", "Proportion occupied")) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+```
+
+## Fit a simple model
+
+Estimate annual probabilities of NZM occurrence at site $i$ in year $j$
+
+$$
+Pr(y_i = 1) = logit^{-1}(\beta_0 + \alpha_{j[i]} )
+$$
+
+$$
+\alpha_j \sim N(0,\sigma_{year})
+$$
+
+## Compare raw proportions to HM estimates
+
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, message=FALSE, results='hide'}
+m1 <- stan_glmer(formula = yvar ~  1 +
+                   (1 | year),
+                 family = binomial,
+                 data = nzm_dat,
+                 seed = 349, iter = 2000, chains = 3)
+
+# summary(m1)
+
+# Grab mcmc draws for intercepts and slopes
+fits <- m1 %>%
+  as_tibble() %>%
+  rename(intercept = `(Intercept)`) %>%
+  select(-starts_with("Sigma") )
+
+############ Function to sum to get random intercept and slopes
+shift_draws <- function(draws) {
+  sweep(draws[, -1], MARGIN = 1, STATS = draws[, 1], FUN = "+")
+}
+###################################
+
+# Extract population average intercept and random intercepts for adding to get random intercept values
+ints <- fits %>%
+  select(intercept, starts_with("b[(Intercept)"))
+# Calculate random intercepts
+year_effects_logit <- shift_draws(as.matrix(ints))
+head(year_effects_logit)
+
+year_effects_probs <- apply(year_effects_logit, 2, plogis)
+
+# Posterior summaries of year effects
+post_mean <- as.vector(apply(year_effects_probs, 2, mean))
+Lower <- as.vector(apply(year_effects_probs, 2, quantile, 0.025))
+Upper <- as.vector(apply(year_effects_probs, 2, quantile, 0.975))
+year <- t1nzm$year
+n <- t1nzm$n
+Proportion_occupied <- post_mean
+Estimate <- "HLM"
+
+hlm_ests <- data.frame(year, n, Proportion_occupied,
+                       Estimate, Lower, Upper)
+
+# Overall mean probability of occurrence
+overall_mean <- mean(plogis(ints$intercept))
+
+# Get table with same headings as post summaries for merging
+t1nzm$Estimate <- "Raw"
+t1nzm$Lower <- NA
+t1nzm$Upper <- NA
+
+# Combine raw estimates and hlm estimates for plotting
+plot_dat <- rbind(t1nzm, hlm_ests)
+
+# The points overlapped, so use position_dodge to move them horizontally
+pd <- position_dodge(0.18)
+
+ggplot(plot_dat, aes(x=as.factor(year), y=Proportion_occupied,
+                     color = Estimate)) +
+  geom_errorbar(aes(ymin=Lower, ymax=Upper), width=.1, position=pd) +
+  geom_point(position=pd, size=3) +
+  xlab('Year') +
+  theme_bw() +
+    geom_hline(yintercept=overall_mean ) +
+  ylab('Probability of NZM occurrence') +
+  theme(legend.position = "top", axis.title = element_text(size=12), axis.text = element_text(size=12),
+        legend.title = element_text(size=20), legend.text = element_text(size=20))
+
+
+```
+
+## Beyond 2 varying parameters
+
+$$
+y_i \sim N(X_iB_{j[i]},\sigma^2_y), \quad \text{for}\; i,\ldots n 
+$$
+
+$$
+B_j \sim N(M_B,\Sigma_B), \quad \text{for}\; j,\ldots J
+$$
+
+$B$ = matrix of group-level coefficients
+
+$M_B$ = population average coefficients (mean of the dist'n of the intercepts and slopes)
+
+$\Sigma_B$ = covariance matrix
+
+## Modeling varying parameters
+
+Modeling variation at multiple scales
+
+::: incremental
+-   e.g., variation within reservoirs and among reservoirs
+
+    -   Covariates often measured at both scales, e.g., nutrient concentrations *within* a reservoir and mean depth *of the reservoir*
+
+-   Model variability in intercepts and slopes (e.g., do the effects of covariates vary spatially and, if so, what is driving that variability)
+
+-   Cross-scale interactions
+:::
+
+## Varying-intercept, varying-slope model
+
+$$
+y_i \sim N \left(\alpha_{j(i)}+ \beta_{j(i)} \cdot x_i,\sigma^2 \right) ,  \quad \textrm{ for } i, = 1, \ldots n 
+$$
+
+$$
+\begin{pmatrix} \alpha_j \\ \beta_j \end{pmatrix} \sim MVN \left(\begin{pmatrix}\gamma_\alpha + \gamma_{\alpha1} \cdot z_j \\ 
+\gamma_\beta + \gamma_{\beta1} \cdot z_j\end{pmatrix},\begin{pmatrix} \sigma_\alpha^2 & \sigma_{\alpha\beta}\\  \sigma_{\alpha\beta} & \sigma_\beta^2  \end{pmatrix}\right), \quad \textrm{ for } j = 1, \ldots J
+$$
+
+## Example: Chlorophyll -- total phosphorus relationships
+
+![](limnomap.png)
+
+## A 4-parameter logistic model
+
+$$
+Chl_i = D_{j(i)}+\frac{A_{j(i)}-D_{j(i)}}{1+exp(-C_{j(i)}(TP_i - B_{j(i)})) } + \epsilon_i, \epsilon_i \sim N(0,\sigma^2)
+$$
+
+A = upper asymptote; B = inflection point; C = rate of increase; D = lower asymptote
+
+## A 4-parameter logistic model
+
+$$
+\begin{pmatrix} A_j \\ B_j\\C_j\\ D_j \end{pmatrix} \sim MVN(\mu,\Sigma)
+$$
+
+$$
+\mu = (\bar{A},\bar{B},\bar{C},\bar{D})
+$$
+
+## A 4-parameter logistic model
+
+Model varying parameters
+
+$$
+\begin{pmatrix} A_j \\ B_j\\C_j\\ D_j \end{pmatrix} = \begin{pmatrix}  \gamma_{0a} + \gamma_{1a} \cdot cov_j \\
+\gamma_{0b} + \gamma_{1b} \cdot cov_j \\
+\gamma_{0c} + \gamma_{1c} \cdot cov_j \\
+\gamma_{0d} + \gamma_{1d} \cdot cov_j \\
+\end{pmatrix}
+$$
+
+## Chlorophyll -- total phosphorus relationships
+
+![](4ParamLogistic.png)
+
+## Chlorophyll -- total phosphorus relationships
+
+![](4ParamLogistic_EDU.png)
+
+## Chlorophyll -- total phosphorus relationships
+
+![](figure6.png)
